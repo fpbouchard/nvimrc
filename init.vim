@@ -55,9 +55,7 @@ Plug 'Shougo/deoplete.nvim', { 'do': ':UpdateRemotePlugins' }
 
 Plug 'junegunn/fzf', { 'dir': '~/.fzf', 'do': './install --all' }
 " {{{
-  if has('nvim')
-    let $FZF_DEFAULT_OPTS .= ' --inline-info'
-  endif
+  let $FZF_DEFAULT_OPTS .= ' --inline-info'
 " }}}
 Plug 'junegunn/fzf.vim'
 " {{{
@@ -103,19 +101,18 @@ Plug 'nelstrom/vim-textobj-rubyblock'
 " tests
 Plug 'kassio/neoterm'
 " {{{
-  " Useful maps
+  let g:neoterm_close_when_tests_succeed=1
+  let g:neoterm_rspec_lib_cmd='zeus rspec'
+
+  nmap <silent> <leader>r :call neoterm#test#run('file')<cr>
+  nmap <silent> <leader>R :call neoterm#test#run('current')<cr>
+
   " hide/close terminal
   nnoremap <silent> ,th :call neoterm#close()<cr>
   " clear terminal
   nnoremap <silent> ,tl :call neoterm#clear()<cr>
   " kills the current job (send a <c-c>)
   nnoremap <silent> ,tc :call neoterm#kill()<cr>
-" }}}
-Plug 'janko-m/vim-test'
-" {{{
-  let test#strategy = "neoterm"
-  nmap <silent> <leader>r :TestFile<CR>
-  nmap <silent> <leader>R :TestNearest<CR>
 " }}}
 
 " misc
