@@ -99,13 +99,18 @@ Plug 'kana/vim-textobj-indent'
 Plug 'nelstrom/vim-textobj-rubyblock'
 
 " tests
+Plug 'junegunn/vim-emoji'
 Plug 'kassio/neoterm'
 " {{{
   let g:neoterm_run_tests_bg = 1
   let g:neoterm_raise_when_tests_fail = 1
   "let g:neoterm_close_when_tests_succeed = 1
   let g:neoterm_rspec_lib_cmd = 'zeus rspec'
-  let g:neoterm_test_status = { 'running': '🏃', 'success': '💚', 'failed': '💔' }
+  let g:neoterm_test_status = {
+    \ 'running': emoji#for('running'),
+    \ 'success': emoji#for('green_heart'),
+    \ 'failed': emoji#for('broken_heart')
+    \ }
 
   nmap <silent> <leader>r :call neoterm#test#run('file')<cr>
   nmap <silent> <leader>R :call neoterm#test#run('current')<cr>
