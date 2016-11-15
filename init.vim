@@ -101,12 +101,17 @@ Plug 'nelstrom/vim-textobj-rubyblock'
 " tests
 Plug 'kassio/neoterm'
 " {{{
-  let g:neoterm_close_when_tests_succeed=1
-  let g:neoterm_rspec_lib_cmd='zeus rspec'
+  let g:neoterm_run_tests_bg = 1
+  let g:neoterm_raise_when_tests_fail = 1
+  "let g:neoterm_close_when_tests_succeed = 1
+  let g:neoterm_rspec_lib_cmd = 'zeus rspec'
+  let g:neoterm_test_status = { 'running': '🏃', 'success': '💚', 'failed': '💔' }
 
   nmap <silent> <leader>r :call neoterm#test#run('file')<cr>
   nmap <silent> <leader>R :call neoterm#test#run('current')<cr>
 
+  " toggle terminal
+  nnoremap <silent> ,tt :Ttoggle<cr>
   " hide/close terminal
   nnoremap <silent> ,th :call neoterm#close()<cr>
   " clear terminal
@@ -120,9 +125,21 @@ Plug 'kshenoy/vim-signature'
 Plug 'itchyny/lightline.vim'
 " {{{
   let g:lightline = {
-        \ 'separator': { 'left': '', 'right': '' },
-        \ 'subseparator': { 'left': '', 'right': '' }
-        \ }
+    \ 'active': {
+    \   'right': [ [ 'lineinfo' ], [ 'percent' ],
+    \              [ 'neoterm', 'fileformat', 'fileencoding', 'filetype' ] ]
+    \ },
+    \ 'component_function': {
+    \   'neoterm': 'LightlineNeoterm'
+    \ },
+    \ 'separator': { 'left': '', 'right': '' },
+    \ 'subseparator': { 'left': '', 'right': '' }
+    \ }
+  set noshowmode " Remove duplicate information
+
+  function! LightlineNeoterm()
+    return g:neoterm_statusline
+  endfunction
 " }}}
 
 Plug 'airblade/vim-gitgutter'
@@ -133,7 +150,7 @@ Plug 'airblade/vim-gitgutter'
   let g:gitgutter_eager = 0
 " }}}
 "
-Plug 'AutoTag'
+Plug 'ludovicchabant/vim-gutentags'
 
 Plug 'junegunn/limelight.vim'
 " {{{
