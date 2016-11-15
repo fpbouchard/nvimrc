@@ -106,11 +106,6 @@ Plug 'kassio/neoterm'
   let g:neoterm_raise_when_tests_fail = 1
   "let g:neoterm_close_when_tests_succeed = 1
   let g:neoterm_rspec_lib_cmd = 'zeus rspec'
-  let g:neoterm_test_status = {
-    \ 'running': emoji#for('running'),
-    \ 'success': emoji#for('green_heart'),
-    \ 'failed': emoji#for('broken_heart')
-    \ }
 
   nmap <silent> <leader>r :call neoterm#test#run('file')<cr>
   nmap <silent> <leader>R :call neoterm#test#run('current')<cr>
@@ -166,6 +161,17 @@ Plug 'junegunn/limelight.vim'
 Plug 'frankier/neovim-colors-solarized-truecolor-only'
 
 call plug#end()
+
+" POST PLUGIN
+" ==============================================================
+
+" NEOTERM
+" Dependency on vim-emoji, needs to be loaded
+let g:neoterm_test_status = {
+  \ 'running': emoji#for('running'),
+  \ 'success': emoji#for('green_heart'),
+  \ 'failed': emoji#for('broken_heart')
+  \ }
 
 
 " General settings
@@ -274,9 +280,6 @@ autocmd BufWritePre * :call <SID>StripTrailingWhitespaces()
 " NVIM
 " ==============================================================
 let $NVIM_TUI_ENABLE_CURSOR_SHAPE=1
-" <esc> to exit insert mode in terminal
-"tnoremap <Esc> <C-\><C-n>
-
 
 if filereadable(glob("~/.nvimrc.local"))
   source ~/.nvimrc.local
