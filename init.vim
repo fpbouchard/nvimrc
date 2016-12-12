@@ -1,6 +1,7 @@
 " vim: set ft=vim:
 
-" PLUGINS
+
+" VIM-PLUG
 " ==============================================================
 
 " Autoinstall vim-plug
@@ -13,24 +14,10 @@ endif
 " }}}
 call plug#begin('~/.nvim/plugged')
 
-" tpope!
-if !has("nvim")
-  Plug 'tpope/vim-sensible'
-endif
-Plug 'tpope/vim-endwise'
-Plug 'tpope/vim-fugitive'
-Plug 'tpope/vim-git'
-Plug 'tpope/vim-markdown'
-Plug 'tpope/vim-ragtag'
-Plug 'tpope/vim-rails'
-Plug 'tpope/vim-surround'
-Plug 'tpope/vim-repeat'
-Plug 'tpope/vim-unimpaired'
-Plug 'tpope/vim-bundler'
-Plug 'tpope/vim-sleuth'
-Plug 'tpope/vim-commentary'
 
-" Navigation
+" NAVIGATION / SEARCH
+" ==============================================================
+
 Plug 'scrooloose/nerdtree'
 " {{{
   let g:NERDTreeMinimalUI = 1
@@ -42,16 +29,7 @@ Plug 'scrooloose/nerdtree'
   map <F5> :NERDTreeFind<CR>
 " }}}
 
-
-" Autocomplete/fuzzy search/ack
-" Plug 'Valloric/YouCompleteMe'
-Plug 'Shougo/deoplete.nvim', { 'do': ':UpdateRemotePlugins' }
-" {{{
-  let g:deoplete#enable_at_startup = 1
-  " let g:deoplete#omni#functions = {}
-  " let g:deoplete#omni#functions.ruby = 'rubycomplete#Complete'
-" }}}
-"Plug 'fishbullet/deoplete-ruby'
+Plug 'junegunn/vim-slash'
 
 Plug 'junegunn/fzf', { 'dir': '~/.fzf', 'do': './install --all' }
 " {{{
@@ -59,9 +37,12 @@ Plug 'junegunn/fzf', { 'dir': '~/.fzf', 'do': './install --all' }
 " }}}
 Plug 'junegunn/fzf.vim'
 " {{{
+  let g:fzf_nvim_statusline = 0 " disable statusline overwriting
+
   nnoremap <silent> <Leader><Leader> :Files<CR>
   nnoremap <silent> <Leader>b :Buffers<CR>
   nnoremap <silent> <Leader>o :BTags<CR>
+  nnoremap <silent> <Leader>t :Tags<CR>
   nnoremap <silent> <Leader>ag :Ag <C-R><C-W><C-R>
   imap <c-x><c-k> <plug>(fzf-complete-word)
   imap <c-x><c-f> <plug>(fzf-complete-path)
@@ -74,31 +55,65 @@ Plug 'mileszs/ack.vim'
   let g:ackprg = 'ag --nogroup --nocolor --column'
 " }}}
 
-" Languages/editing
-Plug 'vim-ruby/vim-ruby'
-Plug 'bingaman/vim-sparkup'
+
+" AUTOCOMPLETE
+" ==============================================================
+
+" Plug 'Valloric/YouCompleteMe'
+Plug 'Shougo/deoplete.nvim', { 'do': ':UpdateRemotePlugins' }
 " {{{
-  let g:sparkupArgs = '--no-last-newline --expand-divs'
+  let g:deoplete#enable_at_startup = 1
+  " let g:deoplete#omni#functions = {}
+  " let g:deoplete#omni#functions.ruby = 'rubycomplete#Complete'
 " }}}
+"Plug 'fishbullet/deoplete-ruby'
+
+
+" LANGUAGES
+" ==============================================================
+
+Plug 'vim-ruby/vim-ruby'
+Plug 'tpope/vim-markdown'
+Plug 'tpope/vim-rails'
 Plug 'kchmck/vim-coffee-script'
 Plug 'JSON.vim'
 Plug 'robbles/logstash.vim'
 Plug 'leafgarland/typescript-vim'
 Plug 'ekalinin/Dockerfile.vim'
 
-" Make/link
+
+" EDITING
+" ==============================================================
+
+Plug 'tpope/vim-ragtag'
+Plug 'bingaman/vim-sparkup'
+" {{{
+  let g:sparkupArgs = '--no-last-newline --expand-divs'
+" }}}
+Plug 'tpope/vim-repeat'
+Plug 'tpope/vim-unimpaired'
+Plug 'tpope/vim-sleuth'
+Plug 'tpope/vim-commentary'
+Plug 'tpope/vim-surround'
+Plug 'tpope/vim-endwise'
 Plug 'neomake/neomake'
 " {{{
   autocmd! BufWritePost * Neomake
   let g:neomake_open_list=2
 " }}}
 
-" objects
+
+" TEXT OBJECTS
+" ==============================================================
+
 Plug 'kana/vim-textobj-user'
 Plug 'kana/vim-textobj-indent'
 Plug 'nelstrom/vim-textobj-rubyblock'
 
-" tests
+
+" TERMINAL & TESTS
+" ==============================================================
+
 Plug 'junegunn/vim-emoji'
 Plug 'kassio/neoterm'
 " {{{
@@ -107,8 +122,10 @@ Plug 'kassio/neoterm'
   "let g:neoterm_close_when_tests_succeed = 1
   let g:neoterm_rspec_lib_cmd = 'zeus rspec'
 
+  nmap <silent> <leader>A :call neoterm#test#run('all')<cr>
   nmap <silent> <leader>r :call neoterm#test#run('file')<cr>
   nmap <silent> <leader>R :call neoterm#test#run('current')<cr>
+  nmap <silent> <leader>p :call neoterm#test#rerun()<cr>
 
   " toggle terminal
   nnoremap <silent> ,tt :Ttoggle<cr>
@@ -120,14 +137,25 @@ Plug 'kassio/neoterm'
   nnoremap <silent> ,tc :call neoterm#kill()<cr>
 " }}}
 
-" misc
+
+" GENERAL STATE / STATUSLINE / TABBAR / COLORSCHEME
+" ==============================================================
+
+Plug 'tpope/vim-git'
+Plug 'tpope/vim-fugitive'
+Plug 'tpope/vim-bundler'
 Plug 'kshenoy/vim-signature'
 Plug 'itchyny/lightline.vim'
 " {{{
   let g:lightline = {
     \ 'active': {
+    \   'left': [ [ 'mode', 'paste' ],
+    \             [ 'readonly', 'relativepath', 'modified' ] ],
     \   'right': [ [ 'lineinfo' ], [ 'percent' ],
     \              [ 'neoterm', 'fileformat', 'fileencoding', 'filetype' ] ]
+    \ },
+    \ 'inactive': {
+    \   'left': [ ['relativepath'] ]
     \ },
     \ 'component_function': {
     \   'neoterm': 'LightlineNeoterm'
@@ -146,12 +174,9 @@ Plug 'airblade/vim-gitgutter'
 " {{{
   let g:gitgutter_map_keys = 0
   let g:gitgutter_max_signs = 200
-  let g:gitgutter_realtime = 0
-  let g:gitgutter_eager = 0
 " }}}
-"
-Plug 'ludovicchabant/vim-gutentags'
 
+Plug 'ludovicchabant/vim-gutentags'
 Plug 'junegunn/limelight.vim'
 " {{{
   let g:limelight_default_coefficient = 0.7
@@ -181,7 +206,6 @@ set clipboard=unnamed,unnamedplus
 set title
 set visualbell
 set number          " show line numbers
-set relativenumber  " use relative lines numbering by default
 set hidden          " hide buffers instead of closing
 set lazyredraw      " speed up on large files
 set laststatus=2    " Show the status line all the time
@@ -192,6 +216,7 @@ set nowritebackup
 set noswapfile
 set nowrap                        " Turn off line wrapping.
 set scrolloff=3                   " Show 3 lines of context around the cursor.
+set autoread
 
 " Split below and right
 set splitbelow
@@ -245,7 +270,7 @@ set cursorline
 set colorcolumn=80
 
 " CTags - refresh tags
-map <Leader>tt :!ctags --extra=+f --exclude=.git --exclude=log --exclude=compiled --exclude=tmp -R *<CR><CR>
+map <Leader>c :!ctags --extra=+f --exclude=.git --exclude=log --exclude=compiled --exclude=tmp -R *<CR><CR>
 
 " Clear the current search highlight by pressing Esc
 nnoremap <silent> <esc><esc> :noh<CR><esc>
