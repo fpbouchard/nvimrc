@@ -39,11 +39,27 @@ Plug 'junegunn/fzf.vim'
 " {{{
   let g:fzf_nvim_statusline = 0 " disable statusline overwriting
 
+  " Customize fzf colors to match your color scheme
+  let g:fzf_colors =
+  \ { 'fg':      ['fg', 'Normal'],
+    \ 'bg':      ['bg', 'Normal'],
+    \ 'hl':      ['fg', 'Comment'],
+    \ 'fg+':     ['fg', 'CursorLine', 'CursorColumn', 'Normal'],
+    \ 'bg+':     ['bg', 'CursorLine', 'CursorColumn'],
+    \ 'hl+':     ['fg', 'Statement'],
+    \ 'info':    ['fg', 'PreProc'],
+    \ 'border':  ['fg', 'Ignore'],
+    \ 'prompt':  ['fg', 'Conditional'],
+    \ 'pointer': ['fg', 'Exception'],
+    \ 'marker':  ['fg', 'Keyword'],
+    \ 'spinner': ['fg', 'Label'],
+    \ 'header':  ['fg', 'Comment'] }
+
   nnoremap <silent> <Leader><Leader> :Files<CR>
   nnoremap <silent> <Leader>b :Buffers<CR>
   nnoremap <silent> <Leader>o :BTags<CR>
   nnoremap <silent> <Leader>t :Tags<CR>
-  nnoremap <silent> <Leader>ag :Ag <C-R><C-W><C-R>
+  nnoremap <silent> <Leader>ag :Ag <C-R><C-W><C-R><CR><CR>
   imap <c-x><c-k> <plug>(fzf-complete-word)
   imap <c-x><c-f> <plug>(fzf-complete-path)
   imap <c-x><c-j> <plug>(fzf-complete-file-ag)
@@ -59,15 +75,14 @@ Plug 'mileszs/ack.vim'
 " AUTOCOMPLETE
 " ==============================================================
 
-" Plug 'Valloric/YouCompleteMe'
-Plug 'Shougo/deoplete.nvim', { 'do': ':UpdateRemotePlugins' }
+Plug 'roxma/nvim-completion-manager'
 " {{{
-  let g:deoplete#enable_at_startup = 1
-  " let g:deoplete#omni#functions = {}
-  " let g:deoplete#omni#functions.ruby = 'rubycomplete#Complete'
+  inoremap <expr> <Tab> pumvisible() ? "\<C-n>" : "\<Tab>"
+  inoremap <expr> <S-Tab> pumvisible() ? "\<C-p>" : "\<S-Tab>"
 " }}}
-"Plug 'fishbullet/deoplete-ruby'
+Plug 'roxma/ncm-rct-complete'
 
+Plug 'w0rp/ale'
 
 " LANGUAGES
 " ==============================================================
@@ -75,20 +90,21 @@ Plug 'Shougo/deoplete.nvim', { 'do': ':UpdateRemotePlugins' }
 Plug 'vim-ruby/vim-ruby'
 Plug 'tpope/vim-markdown'
 Plug 'tpope/vim-rails'
-Plug 'kchmck/vim-coffee-script'
-Plug 'JSON.vim'
+"Plug 'kchmck/vim-coffee-script'
+"Plug 'JSON.vim'
 Plug 'robbles/logstash.vim'
 Plug 'leafgarland/typescript-vim'
 Plug 'ekalinin/Dockerfile.vim'
+Plug 'artur-shaik/vim-javacomplete2'
 
 
 " EDITING
 " ==============================================================
 
 Plug 'tpope/vim-ragtag'
-Plug 'bingaman/vim-sparkup'
+"Plug 'bingaman/vim-sparkup'
 " {{{
-  let g:sparkupArgs = '--no-last-newline --expand-divs'
+"  let g:sparkupArgs = '--no-last-newline --expand-divs'
 " }}}
 Plug 'tpope/vim-repeat'
 Plug 'tpope/vim-unimpaired'
@@ -96,11 +112,6 @@ Plug 'tpope/vim-sleuth'
 Plug 'tpope/vim-commentary'
 Plug 'tpope/vim-surround'
 Plug 'tpope/vim-endwise'
-Plug 'neomake/neomake'
-" {{{
-  autocmd! BufWritePost * Neomake
-  let g:neomake_open_list=2
-" }}}
 
 
 " TEXT OBJECTS
@@ -115,26 +126,15 @@ Plug 'nelstrom/vim-textobj-rubyblock'
 " ==============================================================
 
 Plug 'junegunn/vim-emoji'
-Plug 'kassio/neoterm'
+Plug 'janko-m/vim-test'
 " {{{
-  let g:neoterm_run_tests_bg = 1
-  let g:neoterm_raise_when_tests_fail = 1
-  "let g:neoterm_close_when_tests_succeed = 1
-  let g:neoterm_rspec_lib_cmd = 'zeus rspec'
+  nmap <silent> <leader>A :TestSuite<CR>
+  nmap <silent> <leader>r :TestNearest<CR>
+  nmap <silent> <leader>R :TestFile<CR>
+  nmap <silent> <leader>p :TestLast<CR>
 
-  nmap <silent> <leader>A :call neoterm#test#run('all')<cr>
-  nmap <silent> <leader>r :call neoterm#test#run('file')<cr>
-  nmap <silent> <leader>R :call neoterm#test#run('current')<cr>
-  nmap <silent> <leader>p :call neoterm#test#rerun()<cr>
-
-  " toggle terminal
-  nnoremap <silent> ,tt :Ttoggle<cr>
-  " hide/close terminal
-  nnoremap <silent> ,th :call neoterm#close()<cr>
-  " clear terminal
-  nnoremap <silent> ,tl :call neoterm#clear()<cr>
-  " kills the current job (send a <c-c>)
-  nnoremap <silent> ,tc :call neoterm#kill()<cr>
+  " Easier to just press C-o to switch to normal mode in terminal
+  tmap <C-o> <C-\><C-n>
 " }}}
 
 
@@ -145,29 +145,37 @@ Plug 'tpope/vim-git'
 Plug 'tpope/vim-fugitive'
 Plug 'tpope/vim-bundler'
 Plug 'kshenoy/vim-signature'
+
 Plug 'itchyny/lightline.vim'
+Plug 'maximbaz/lightline-ale'
 " {{{
   let g:lightline = {
     \ 'active': {
     \   'left': [ [ 'mode', 'paste' ],
     \             [ 'readonly', 'relativepath', 'modified' ] ],
-    \   'right': [ [ 'lineinfo' ], [ 'percent' ],
-    \              [ 'neoterm', 'fileformat', 'fileencoding', 'filetype' ] ]
+    \   'right': [ [ 'linter_errors', 'linter_warnings', 'linter_ok' ], [ 'lineinfo' ], [ 'percent' ],
+    \              [ 'fileformat', 'fileencoding', 'filetype' ] ]
     \ },
     \ 'inactive': {
     \   'left': [ ['relativepath'] ]
     \ },
-    \ 'component_function': {
-    \   'neoterm': 'LightlineNeoterm'
-    \ },
     \ 'separator': { 'left': '', 'right': '' },
     \ 'subseparator': { 'left': '', 'right': '' }
     \ }
+  let g:lightline.component_expand = {
+      \  'linter_warnings': 'lightline#ale#warnings',
+      \  'linter_errors': 'lightline#ale#errors',
+      \  'linter_ok': 'lightline#ale#ok',
+      \ }
+  let g:lightline.component_type = {
+      \     'linter_warnings': 'warning',
+      \     'linter_errors': 'error',
+      \     'linter_ok': 'left',
+      \ }
+  let g:lightline#ale#indicator_warnings = "\uf071"
+  let g:lightline#ale#indicator_errors = "\uf05e"
+  let g:lightline#ale#indicator_ok = "\uf00c"
   set noshowmode " Remove duplicate information
-
-  function! LightlineNeoterm()
-    return g:neoterm_statusline
-  endfunction
 " }}}
 
 Plug 'airblade/vim-gitgutter'
@@ -177,27 +185,14 @@ Plug 'airblade/vim-gitgutter'
 " }}}
 
 Plug 'ludovicchabant/vim-gutentags'
-Plug 'junegunn/limelight.vim'
-" {{{
-  let g:limelight_default_coefficient = 0.7
-  nmap <silent> gl :Limelight!!<CR>
-" }}}
 
-Plug 'frankier/neovim-colors-solarized-truecolor-only'
+"Plug 'frankier/neovim-colors-solarized-truecolor-only'
+Plug 'NLKNguyen/papercolor-theme'
 
 call plug#end()
 
 " POST PLUGIN
 " ==============================================================
-
-" NEOTERM
-" Dependency on vim-emoji, needs to be loaded
-let g:neoterm_test_status = {
-  \ 'running': emoji#for('running'),
-  \ 'success': emoji#for('green_heart'),
-  \ 'failed': emoji#for('broken_heart')
-  \ }
-
 
 " General settings
 " ==============================================================
@@ -259,9 +254,10 @@ noremap <Leader>f :setlocal foldmethod=syntax foldcolumn=4<CR>
 " COLORSCHEME
 " ==============================================================
 set termguicolors
-set background=dark
-colorscheme solarized
-call togglebg#map("<F4>")
+" set background=dark
+" colorscheme solarized
+colorscheme papercolor
+" call togglebg#map("<F4>")
 
 
 " MISC
@@ -304,7 +300,9 @@ autocmd BufWritePre * :call <SID>StripTrailingWhitespaces()
 
 " NVIM
 " ==============================================================
-let $NVIM_TUI_ENABLE_CURSOR_SHAPE=1
+"set guicursor=n-v-c:block-Cursor/lCursor-blinkon0,i-ci:ver25-Cursor/lCursor,r-cr:hor20-Cursor/lCursor
+set guicursor=n-v-c:block,i-ci-ve:ver25,r-cr:hor20,o:hor50,a:blinkwait700-blinkoff400-blinkon250-Cursor/lCursor,sm:block-blinkwait175-blinkoff150-blinkon175
+
 
 if filereadable(glob("~/.nvimrc.local"))
   source ~/.nvimrc.local
