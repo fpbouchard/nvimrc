@@ -56,6 +56,7 @@ Plug 'junegunn/fzf.vim'
     \ 'header':  ['fg', 'Comment'] }
 
   nnoremap <silent> <Leader><Leader> :Files<CR>
+  nnoremap <silent> <Leader>g :GFiles<CR>
   nnoremap <silent> <Leader>b :Buffers<CR>
   nnoremap <silent> <Leader>o :BTags<CR>
   nnoremap <silent> <Leader>t :Tags<CR>
@@ -75,14 +76,30 @@ Plug 'mileszs/ack.vim'
 " AUTOCOMPLETE
 " ==============================================================
 
-Plug 'roxma/nvim-completion-manager'
+Plug 'Shougo/deoplete.nvim', { 'do': ':UpdateRemotePlugins' }
 " {{{
-  inoremap <expr> <Tab> pumvisible() ? "\<C-n>" : "\<Tab>"
-  inoremap <expr> <S-Tab> pumvisible() ? "\<C-p>" : "\<S-Tab>"
+let g:deoplete#enable_at_startup = 1
+" {{{
+
+Plug 'carlitux/deoplete-ternjs', { 'do': 'npm install -g tern' }
+" {{{
+let g:deoplete#sources#ternjs#types = 1
+let g:deoplete#sources#ternjs#depths = 1
 " }}}
-Plug 'roxma/ncm-rct-complete'
 
 Plug 'w0rp/ale'
+" {{{
+let g:ale_sign_column_always = 1
+
+let g:ale_fixers = {
+\   '*': ['remove_trailing_lines', 'trim_whitespace'],
+\   'javascript': ['eslint'],
+\   'ruby': ['rubocop']
+\}
+
+nmap <silent> <C-k> <Plug>(ale_previous_wrap)
+nmap <silent> <C-j> <Plug>(ale_next_wrap)
+" }}}
 
 " LANGUAGES
 " ==============================================================
@@ -90,12 +107,15 @@ Plug 'w0rp/ale'
 Plug 'vim-ruby/vim-ruby'
 Plug 'tpope/vim-markdown'
 Plug 'tpope/vim-rails'
-"Plug 'kchmck/vim-coffee-script'
+Plug 'kchmck/vim-coffee-script'
 "Plug 'JSON.vim'
+Plug 'pangloss/vim-javascript'
+Plug 'mxw/vim-jsx'
 Plug 'robbles/logstash.vim'
 Plug 'leafgarland/typescript-vim'
 Plug 'ekalinin/Dockerfile.vim'
 Plug 'artur-shaik/vim-javacomplete2'
+Plug 'milch/vim-fastlane'
 
 
 " EDITING
@@ -112,6 +132,15 @@ Plug 'tpope/vim-sleuth'
 Plug 'tpope/vim-commentary'
 Plug 'tpope/vim-surround'
 Plug 'tpope/vim-endwise'
+
+Plug 'junegunn/vim-easy-align'
+" {{{
+" Start interactive EasyAlign in visual mode (e.g. vipga)
+xmap ga <Plug>(EasyAlign)
+
+" Start interactive EasyAlign for a motion/text object (e.g. gaip)
+nmap ga <Plug>(EasyAlign)
+" }}}
 
 
 " TEXT OBJECTS
@@ -172,9 +201,9 @@ Plug 'maximbaz/lightline-ale'
       \     'linter_errors': 'error',
       \     'linter_ok': 'left',
       \ }
-  let g:lightline#ale#indicator_warnings = "\uf071"
-  let g:lightline#ale#indicator_errors = "\uf05e"
-  let g:lightline#ale#indicator_ok = "\uf00c"
+  let g:lightline#ale#indicator_warnings = "?"
+  let g:lightline#ale#indicator_errors = "!"
+  let g:lightline#ale#indicator_ok = "-"
   set noshowmode " Remove duplicate information
 " }}}
 
@@ -263,7 +292,7 @@ colorscheme papercolor
 " MISC
 " ==============================================================
 set cursorline
-set colorcolumn=80
+set colorcolumn=200
 
 " CTags - refresh tags
 map <Leader>c :!ctags --extra=+f --exclude=.git --exclude=log --exclude=compiled --exclude=tmp -R *<CR><CR>
