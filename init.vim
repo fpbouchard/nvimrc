@@ -6,13 +6,17 @@
 
 " Autoinstall vim-plug
 " {{{
-if empty(glob('~/.nvim/autoload/plug.vim'))
-  silent !curl -fLo ~/.nvim/autoload/plug.vim --create-dirs
+if empty(glob('~/.config/nvim/autoload/plug.vim'))
+  silent !curl -fLo ~/.config/nvim/autoload/plug.vim --create-dirs
       \ https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
   autocmd VimEnter * PlugInstall
 endif
 " }}}
 call plug#begin('~/.nvim/plugged')
+
+" GLOBAL SETUP
+let g:python_host_prog  = '/usr/local/bin/python'
+let g:python3_host_prog = '/usr/local/bin/python3'
 
 
 " NAVIGATION / SEARCH
@@ -28,8 +32,6 @@ Plug 'scrooloose/nerdtree'
   map <F6> :NERDTreeToggle<CR>
   map <F5> :NERDTreeFind<CR>
 " }}}
-
-Plug 'junegunn/vim-slash'
 
 Plug 'junegunn/fzf', { 'dir': '~/.fzf', 'do': './install --all' }
 " {{{
@@ -76,15 +78,46 @@ Plug 'mileszs/ack.vim'
 " AUTOCOMPLETE
 " ==============================================================
 
-Plug 'Shougo/deoplete.nvim', { 'do': ':UpdateRemotePlugins' }
+Plug 'neoclide/coc.nvim', {'tag': '*', 'do': { -> coc#util#install()}}
 " {{{
-let g:deoplete#enable_at_startup = 1
-" {{{
+" Use tab for trigger completion with characters ahead and navigate.
+" Use command ':verbose imap <tab>' to make sure tab is not mapped by other plugin.
+inoremap <silent><expr> <TAB>
+      \ pumvisible() ? "\<C-n>" :
+      \ <SID>check_back_space() ? "\<TAB>" :
+      \ coc#refresh()
+inoremap <expr><S-TAB> pumvisible() ? "\<C-p>" : "\<C-h>"
 
-Plug 'carlitux/deoplete-ternjs', { 'do': 'npm install -g tern' }
-" {{{
-let g:deoplete#sources#ternjs#types = 1
-let g:deoplete#sources#ternjs#depths = 1
+
+function! s:check_back_space() abort
+  let col = col('.') - 1
+  return !col || getline('.')[col - 1]  =~# '\s'
+endfunction
+
+" Use <c-space> for trigger completion.
+inoremap <silent><expr> <c-space> coc#refresh()
+
+" Use <cr> for confirm completion.
+" Coc only does snippet and additional edit on confirm.
+inoremap <CR> <C-G>u<CR>
+
+" Remap keys for gotos
+nmap <silent> gd <Plug>(coc-definition)
+nmap <silent> gy <Plug>(coc-type-definition)
+nmap <silent> gi <Plug>(coc-implementation)
+nmap <silent> gr <Plug>(coc-references)
+
+" Use K for show documentation in preview window
+nnoremap <silent> K :call <SID>show_documentation()<CR>
+
+function! s:show_documentation()
+  if &filetype == 'vim'
+    execute 'h '.expand('<cword>')
+  else
+    call CocAction('doHover')
+  endif
+endfunction
+
 " }}}
 
 Plug 'w0rp/ale'
@@ -111,11 +144,11 @@ Plug 'kchmck/vim-coffee-script'
 "Plug 'JSON.vim'
 Plug 'pangloss/vim-javascript'
 Plug 'mxw/vim-jsx'
-Plug 'robbles/logstash.vim'
 Plug 'leafgarland/typescript-vim'
 Plug 'ekalinin/Dockerfile.vim'
-Plug 'artur-shaik/vim-javacomplete2'
 Plug 'milch/vim-fastlane'
+Plug 'neoclide/jsonc.vim'
+
 
 
 " EDITING
@@ -133,13 +166,13 @@ Plug 'tpope/vim-commentary'
 Plug 'tpope/vim-surround'
 Plug 'tpope/vim-endwise'
 
-Plug 'junegunn/vim-easy-align'
+"Plug 'junegunn/vim-easy-align'
 " {{{
 " Start interactive EasyAlign in visual mode (e.g. vipga)
-xmap ga <Plug>(EasyAlign)
+"xmap ga <Plug>(EasyAlign)
 
 " Start interactive EasyAlign for a motion/text object (e.g. gaip)
-nmap ga <Plug>(EasyAlign)
+"nmap ga <Plug>(EasyAlign)
 " }}}
 
 
@@ -155,6 +188,11 @@ Plug 'nelstrom/vim-textobj-rubyblock'
 " ==============================================================
 
 Plug 'junegunn/vim-emoji'
+Plug 'kassio/neoterm'
+" {{{
+  let g:neoterm_default_mod = ":botright"
+  let g:neoterm_autoscroll = 1
+" }}}
 Plug 'janko-m/vim-test'
 " {{{
   nmap <silent> <leader>A :TestSuite<CR>
@@ -164,6 +202,8 @@ Plug 'janko-m/vim-test'
 
   " Easier to just press C-o to switch to normal mode in terminal
   tmap <C-o> <C-\><C-n>
+
+  let test#strategy = "neoterm"
 " }}}
 
 
@@ -181,12 +221,13 @@ Plug 'maximbaz/lightline-ale'
   let g:lightline = {
     \ 'active': {
     \   'left': [ [ 'mode', 'paste' ],
-    \             [ 'readonly', 'relativepath', 'modified' ] ],
+    \             [ 'gitbranch', 'readonly', 'relativepath', 'modified' ] ],
     \   'right': [ [ 'linter_errors', 'linter_warnings', 'linter_ok' ], [ 'lineinfo' ], [ 'percent' ],
-    \              [ 'fileformat', 'fileencoding', 'filetype' ] ]
+    \              [ 'filetype' ] ]
     \ },
     \ 'inactive': {
-    \   'left': [ ['relativepath'] ]
+    \   'left': [ ['relativepath'] ],
+    \   'right': []
     \ },
     \ 'separator': { 'left': '', 'right': '' },
     \ 'subseparator': { 'left': '', 'right': '' }
@@ -200,6 +241,9 @@ Plug 'maximbaz/lightline-ale'
       \     'linter_warnings': 'warning',
       \     'linter_errors': 'error',
       \     'linter_ok': 'left',
+      \ }
+  let g:lightline.component_function = {
+      \     'gitbranch': 'fugitive#head'
       \ }
   let g:lightline#ale#indicator_warnings = "?"
   let g:lightline#ale#indicator_errors = "!"
@@ -215,8 +259,8 @@ Plug 'airblade/vim-gitgutter'
 
 Plug 'ludovicchabant/vim-gutentags'
 
-"Plug 'frankier/neovim-colors-solarized-truecolor-only'
-Plug 'NLKNguyen/papercolor-theme'
+Plug 'frankier/neovim-colors-solarized-truecolor-only'
+"Plug 'NLKNguyen/papercolor-theme'
 
 call plug#end()
 
@@ -240,7 +284,10 @@ set nowritebackup
 set noswapfile
 set nowrap                        " Turn off line wrapping.
 set scrolloff=3                   " Show 3 lines of context around the cursor.
+
 set autoread
+" This makes sure that autoread gets triggered when nvim gets the focus
+au FocusGained * silent! checktime
 
 " Split below and right
 set splitbelow
@@ -283,10 +330,9 @@ noremap <Leader>f :setlocal foldmethod=syntax foldcolumn=4<CR>
 " COLORSCHEME
 " ==============================================================
 set termguicolors
-" set background=dark
-" colorscheme solarized
-colorscheme papercolor
-" call togglebg#map("<F4>")
+colorscheme solarized
+set background=dark
+call togglebg#map("<F4>")
 
 
 " MISC
