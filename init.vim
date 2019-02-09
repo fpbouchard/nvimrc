@@ -28,9 +28,15 @@ Plug 'scrooloose/nerdtree'
   let g:NERDTreeDirArrows = 1
   let g:NERDTreeChDirMode = 2
   let g:NERDTreeAutoDeleteBuffer = 1
+  let g:NERDTreeIgnore = ['node_modules']
 
   map <F6> :NERDTreeToggle<CR>
   map <F5> :NERDTreeFind<CR>
+" }}}
+Plug 'Xuyuanp/nerdtree-git-plugin', { 'on': 'NERDTreeToggle' }
+" {{{
+  let g:NERDTreeUpdateOnCursorHold = 0
+  let g:NERDTreeUpdateOnWrite      = 0
 " }}}
 
 Plug 'junegunn/fzf', { 'dir': '~/.fzf', 'do': './install --all' }
@@ -39,7 +45,9 @@ Plug 'junegunn/fzf', { 'dir': '~/.fzf', 'do': './install --all' }
 " }}}
 Plug 'junegunn/fzf.vim'
 " {{{
-  let g:fzf_nvim_statusline = 0 " disable statusline overwriting
+  let g:fzf_commits_log_options = '--color=always
+    \ --format="%C(yellow)%h%C(red)%d%C(reset)
+    \ - %C(bold green)(%ar)%C(reset) %s %C(blue)<%an>%C(reset)"'
 
   " Customize fzf colors to match your color scheme
   let g:fzf_colors =
@@ -57,21 +65,46 @@ Plug 'junegunn/fzf.vim'
     \ 'spinner': ['fg', 'Label'],
     \ 'header':  ['fg', 'Comment'] }
 
+  autocmd! FileType fzf
+  autocmd  FileType fzf set laststatus=0 noshowmode noruler
+    \| autocmd BufLeave <buffer> set laststatus=2 showmode ruler
+
   nnoremap <silent> <Leader><Leader> :Files<CR>
-  nnoremap <silent> <Leader>g :GFiles<CR>
   nnoremap <silent> <Leader>b :Buffers<CR>
   nnoremap <silent> <Leader>o :BTags<CR>
   nnoremap <silent> <Leader>t :Tags<CR>
-  nnoremap <silent> <Leader>ag :Ag <C-R><C-W><C-R><CR><CR>
+  nnoremap <silent> <leader>c  :Commits<CR>
+  nnoremap <silent> <leader>cb :BCommits<CR>
+
+  " Mapping selecting mappings
+  nmap <leader><tab> <plug>(fzf-maps-n)
+  xmap <leader><tab> <plug>(fzf-maps-x)
+  omap <leader><tab> <plug>(fzf-maps-o)
+
+  " Insert mode completion
   imap <c-x><c-k> <plug>(fzf-complete-word)
   imap <c-x><c-f> <plug>(fzf-complete-path)
-  imap <c-x><c-j> <plug>(fzf-complete-file-ag)
   imap <c-x><c-l> <plug>(fzf-complete-line)
-" }}}
 
-Plug 'mileszs/ack.vim'
-" {{{
-  let g:ackprg = 'ag --nogroup --nocolor --column'
+  " Global line completion (not just open buffers. ripgrep required.)
+  inoremap <expr> <c-x><c-l> fzf#vim#complete(fzf#wrap({
+    \ 'prefix': '^.*$',
+    \ 'source': 'rg -n ^ --color always',
+    \ 'options': '--ansi --delimiter : --nth 3..',
+    \ 'reducer': { lines -> join(split(lines[0], ':\zs')[2:], '') }}))
+
+  " Rg with preview
+  command! -bang -nargs=* Rg
+    \ call fzf#vim#grep(
+    \   'rg --column --line-number --no-heading --color=always --smart-case '.shellescape(<q-args>), 1,
+    \   fzf#vim#with_preview('right:50%', '?'),
+    \   <bang>0)
+
+  nnoremap <silent> <Leader>rg :Rg <C-R><C-W><C-R><CR><CR>
+
+  " Files command with preview window
+  command! -bang -nargs=? -complete=dir Files
+    \ call fzf#vim#files(<q-args>, fzf#vim#with_preview(), <bang>0)
 " }}}
 
 
@@ -139,26 +172,21 @@ nmap <silent> <C-j> <Plug>(ale_next_wrap)
 
 Plug 'vim-ruby/vim-ruby'
 Plug 'tpope/vim-markdown'
+Plug 'iamcco/markdown-preview.nvim', { 'do': 'cd app & yarn install'  }
 Plug 'tpope/vim-rails'
-Plug 'kchmck/vim-coffee-script'
+"Plug 'kchmck/vim-coffee-script'
 "Plug 'JSON.vim'
 Plug 'pangloss/vim-javascript'
 Plug 'mxw/vim-jsx'
 Plug 'leafgarland/typescript-vim'
 Plug 'ekalinin/Dockerfile.vim'
-Plug 'milch/vim-fastlane'
+"Plug 'milch/vim-fastlane'
 Plug 'neoclide/jsonc.vim'
-
-
 
 " EDITING
 " ==============================================================
 
 Plug 'tpope/vim-ragtag'
-"Plug 'bingaman/vim-sparkup'
-" {{{
-"  let g:sparkupArgs = '--no-last-newline --expand-divs'
-" }}}
 Plug 'tpope/vim-repeat'
 Plug 'tpope/vim-unimpaired'
 Plug 'tpope/vim-sleuth'
@@ -166,22 +194,12 @@ Plug 'tpope/vim-commentary'
 Plug 'tpope/vim-surround'
 Plug 'tpope/vim-endwise'
 
-"Plug 'junegunn/vim-easy-align'
-" {{{
-" Start interactive EasyAlign in visual mode (e.g. vipga)
-"xmap ga <Plug>(EasyAlign)
-
-" Start interactive EasyAlign for a motion/text object (e.g. gaip)
-"nmap ga <Plug>(EasyAlign)
-" }}}
-
 
 " TEXT OBJECTS
 " ==============================================================
 
-Plug 'kana/vim-textobj-user'
-Plug 'kana/vim-textobj-indent'
-Plug 'nelstrom/vim-textobj-rubyblock'
+Plug 'wellle/targets.vim'
+Plug 'michaeljsmith/vim-indent-object'
 
 
 " TERMINAL & TESTS
@@ -212,6 +230,10 @@ Plug 'janko-m/vim-test'
 
 Plug 'tpope/vim-git'
 Plug 'tpope/vim-fugitive'
+" {{{
+  nnoremap <silent> <Leader>gb :Gblame<CR>
+  nnoremap <silent> <Leader>gd :Gdiff<CR>
+" }}}
 Plug 'tpope/vim-bundler'
 Plug 'kshenoy/vim-signature'
 
@@ -258,9 +280,11 @@ Plug 'airblade/vim-gitgutter'
 " }}}
 
 Plug 'ludovicchabant/vim-gutentags'
+" {{{
+  let g:gutentags_file_list_command = 'rg --files'
+" }}}
 
 Plug 'frankier/neovim-colors-solarized-truecolor-only'
-"Plug 'NLKNguyen/papercolor-theme'
 
 call plug#end()
 
@@ -288,6 +312,8 @@ set scrolloff=3                   " Show 3 lines of context around the cursor.
 set autoread
 " This makes sure that autoread gets triggered when nvim gets the focus
 au FocusGained * silent! checktime
+
+set timeoutlen=500 " shorten the delay to wait when a mapped sequence is started
 
 " Split below and right
 set splitbelow
@@ -341,7 +367,7 @@ set cursorline
 set colorcolumn=200
 
 " CTags - refresh tags
-map <Leader>c :!ctags --extra=+f --exclude=.git --exclude=log --exclude=compiled --exclude=tmp -R *<CR><CR>
+"map <Leader>c :!ctags --extra=+f --exclude=.git --exclude=log --exclude=compiled --exclude=tmp -R *<CR><CR>
 
 " Clear the current search highlight by pressing Esc
 nnoremap <silent> <esc><esc> :noh<CR><esc>
