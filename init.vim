@@ -15,8 +15,8 @@ endif
 call plug#begin('~/.nvim/plugged')
 
 " GLOBAL SETUP
-let g:python_host_prog  = '/usr/local/bin/python'
-let g:python3_host_prog = '/usr/local/bin/python3'
+"let g:python_host_prog  = '/usr/local/bin/python'
+"let g:python3_host_prog = '/usr/local/bin/python3'
 
 
 " NAVIGATION / SEARCH
@@ -151,17 +151,27 @@ function! s:show_documentation()
   endif
 endfunction
 
+command! -nargs=0 Prettier :CocCommand prettier.formatFile
+
 " }}}
 
 Plug 'w0rp/ale'
 " {{{
 let g:ale_sign_column_always = 1
+let g:ale_fix_on_save = 1
+
+let g:ale_linters = {
+\   'javascript': ['eslint'],
+\   'typescript': ['tslint']
+\}
 
 let g:ale_fixers = {
 \   '*': ['remove_trailing_lines', 'trim_whitespace'],
-\   'javascript': ['eslint'],
+\   'javascript': ['prettier'],
+\   'typescript': ['prettier'],
 \   'ruby': ['rubocop']
 \}
+
 
 nmap <silent> <C-k> <Plug>(ale_previous_wrap)
 nmap <silent> <C-j> <Plug>(ale_next_wrap)
@@ -383,20 +393,6 @@ function! SetCursorPosition()
     endif
   end
 endfunction
-
-" Strip trailing whitespace
-function! <SID>StripTrailingWhitespaces()
-  " Preparation: save last search, and cursor position.
-  let _s=@/
-  let l = line(".")
-  let c = col(".")
-  " Do the business:
-  %s/\s\+$//e
-  " Clean up: restore previous search history, and cursor position
-  let @/=_s
-  call cursor(l, c)
-endfunction
-autocmd BufWritePre * :call <SID>StripTrailingWhitespaces()
 
 
 " NVIM

@@ -1,3 +1,6 @@
 {
   "coc.preferences.diagnostic.enable": true,
+  "tsserver.orgnizeImportOnSave": true,
+  "typescript.validate.enable": false,
+  "tsserver.formatOnType": true
 }
