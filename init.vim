@@ -14,11 +14,6 @@ endif
 " }}}
 call plug#begin('~/.nvim/plugged')
 
-" GLOBAL SETUP
-"let g:python_host_prog  = '/usr/local/bin/python'
-"let g:python3_host_prog = '/usr/local/bin/python3'
-
-
 " NAVIGATION / SEARCH
 " ==============================================================
 
