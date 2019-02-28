@@ -1,6 +1,6 @@
 {
   "coc.preferences.diagnostic.enable": true,
-  "tsserver.orgnizeImportOnSave": true,
+  "coc.preferences.diagnostic.displayByAle": true,
   "typescript.validate.enable": false,
-  "tsserver.formatOnType": true
+  "javascript.validate.enable": false
 }

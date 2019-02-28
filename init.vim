@@ -17,22 +17,25 @@ call plug#begin('~/.nvim/plugged')
 " NAVIGATION / SEARCH
 " ==============================================================
 
-Plug 'scrooloose/nerdtree'
-" {{{
-  let g:NERDTreeMinimalUI = 1
-  let g:NERDTreeDirArrows = 1
-  let g:NERDTreeChDirMode = 2
-  let g:NERDTreeAutoDeleteBuffer = 1
-  let g:NERDTreeIgnore = ['node_modules']
+Plug 'justinmk/vim-dirvish'
+Plug 'kristijanhusak/vim-dirvish-git'
 
-  map <F6> :NERDTreeToggle<CR>
-  map <F5> :NERDTreeFind<CR>
-" }}}
-Plug 'Xuyuanp/nerdtree-git-plugin', { 'on': 'NERDTreeToggle' }
-" {{{
-  let g:NERDTreeUpdateOnCursorHold = 0
-  let g:NERDTreeUpdateOnWrite      = 0
-" }}}
+"Plug 'scrooloose/nerdtree'
+"" {{{
+"  let g:NERDTreeMinimalUI = 1
+"  let g:NERDTreeDirArrows = 1
+"  let g:NERDTreeChDirMode = 2
+"  let g:NERDTreeAutoDeleteBuffer = 1
+"  let g:NERDTreeIgnore = ['node_modules']
+"
+"  map <F6> :NERDTreeToggle<CR>
+"  map <F5> :NERDTreeFind<CR>
+"" }}}
+"Plug 'Xuyuanp/nerdtree-git-plugin', { 'on': 'NERDTreeToggle' }
+"" {{{
+"  let g:NERDTreeUpdateOnCursorHold = 0
+"  let g:NERDTreeUpdateOnWrite      = 0
+"" }}}
 
 Plug 'junegunn/fzf', { 'dir': '~/.fzf', 'do': './install --all' }
 " {{{
@@ -153,18 +156,18 @@ command! -nargs=0 Prettier :CocCommand prettier.formatFile
 Plug 'w0rp/ale'
 " {{{
 let g:ale_sign_column_always = 1
-let g:ale_fix_on_save = 1
+"let g:ale_fix_on_save = 1
 
 let g:ale_linters = {
 \   'javascript': ['eslint'],
-\   'typescript': ['tslint']
+\   'typescript': ['tslint'],
+\   'ruby': ['rubocop']
 \}
 
 let g:ale_fixers = {
 \   '*': ['remove_trailing_lines', 'trim_whitespace'],
-\   'javascript': ['prettier'],
-\   'typescript': ['prettier'],
-\   'ruby': ['rubocop']
+\   'javascript': ['prettier', 'eslint'],
+\   'typescript': ['prettier', 'tslint']
 \}
 
 
