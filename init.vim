@@ -20,23 +20,6 @@ call plug#begin('~/.nvim/plugged')
 Plug 'justinmk/vim-dirvish'
 Plug 'kristijanhusak/vim-dirvish-git'
 
-"Plug 'scrooloose/nerdtree'
-"" {{{
-"  let g:NERDTreeMinimalUI = 1
-"  let g:NERDTreeDirArrows = 1
-"  let g:NERDTreeChDirMode = 2
-"  let g:NERDTreeAutoDeleteBuffer = 1
-"  let g:NERDTreeIgnore = ['node_modules']
-"
-"  map <F6> :NERDTreeToggle<CR>
-"  map <F5> :NERDTreeFind<CR>
-"" }}}
-"Plug 'Xuyuanp/nerdtree-git-plugin', { 'on': 'NERDTreeToggle' }
-"" {{{
-"  let g:NERDTreeUpdateOnCursorHold = 0
-"  let g:NERDTreeUpdateOnWrite      = 0
-"" }}}
-
 Plug 'junegunn/fzf', { 'dir': '~/.fzf', 'do': './install --all' }
 " {{{
   let $FZF_DEFAULT_OPTS .= ' --inline-info'
@@ -109,7 +92,7 @@ Plug 'junegunn/fzf.vim'
 " AUTOCOMPLETE
 " ==============================================================
 
-Plug 'neoclide/coc.nvim', {'tag': '*', 'do': { -> coc#util#install()}}
+Plug 'neoclide/coc.nvim', {'tag': '*', 'do': 'yarn install'}
 " {{{
 " Use tab for trigger completion with characters ahead and navigate.
 " Use command ':verbose imap <tab>' to make sure tab is not mapped by other plugin.
@@ -156,7 +139,7 @@ command! -nargs=0 Prettier :CocCommand prettier.formatFile
 Plug 'w0rp/ale'
 " {{{
 let g:ale_sign_column_always = 1
-"let g:ale_fix_on_save = 1
+let g:ale_fix_on_save = 1
 
 let g:ale_linters = {
 \   'javascript': ['eslint'],
@@ -182,10 +165,10 @@ Plug 'vim-ruby/vim-ruby'
 Plug 'tpope/vim-markdown'
 Plug 'iamcco/markdown-preview.nvim', { 'do': 'cd app & yarn install'  }
 Plug 'tpope/vim-rails'
-"Plug 'kchmck/vim-coffee-script'
 "Plug 'JSON.vim'
 Plug 'pangloss/vim-javascript'
 Plug 'mxw/vim-jsx'
+Plug 'ianks/vim-tsx'
 Plug 'leafgarland/typescript-vim'
 Plug 'ekalinin/Dockerfile.vim'
 "Plug 'milch/vim-fastlane'
