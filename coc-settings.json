@@ -1,5 +1,18 @@
 {
-  "javascript.validate.enable": true,
-  "typescript.validate.enable": true,
-  "diagnostic.displayByAle": true
+  "suggest.enablePreview": true,
+  "diagnostic.displayByAle": true,
+  "languageserver": {
+    "dart": {
+      "command": "dart_language_server", // in windows is dart_language_server.bat
+      "args": [],
+      "filetypes": ["dart"],
+      "initializationOptions": {},
+      "settings": {
+        "dart": {
+          "validation": {},
+          "completion": {}
+        }
+      }
+    }
+  }
 }

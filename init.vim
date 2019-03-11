@@ -102,7 +102,6 @@ inoremap <silent><expr> <TAB>
       \ coc#refresh()
 inoremap <expr><S-TAB> pumvisible() ? "\<C-p>" : "\<C-h>"
 
-
 function! s:check_back_space() abort
   let col = col('.') - 1
   return !col || getline('.')[col - 1]  =~# '\s'
@@ -113,7 +112,7 @@ inoremap <silent><expr> <c-space> coc#refresh()
 
 " Use <cr> for confirm completion.
 " Coc only does snippet and additional edit on confirm.
-inoremap <CR> <C-G>u<CR>
+inoremap <expr> <cr> pumvisible() ? "\<C-y>" : "\<CR>"
 
 " Remap keys for gotos
 nmap <silent> gd <Plug>(coc-definition)
@@ -124,6 +123,14 @@ nmap <silent> gr <Plug>(coc-references)
 " Use K for show documentation in preview window
 nnoremap <silent> K :call <SID>show_documentation()<CR>
 
+" Remap for do codeAction of selected region, ex: `<leader>aap` for current paragraph
+vmap <leader>a  <Plug>(coc-codeaction-selected)
+nmap <leader>a  <Plug>(coc-codeaction-selected)
+
+" Remap for do codeAction of current line
+nmap <leader>ac  <Plug>(coc-codeaction)
+" Fix autofix problem of current line
+nmap <leader>qf  <Plug>(coc-fix-current)
 function! s:show_documentation()
   if &filetype == 'vim'
     execute 'h '.expand('<cword>')
@@ -131,6 +138,24 @@ function! s:show_documentation()
     call CocAction('doHover')
   endif
 endfunction
+
+" Highlight symbol under cursor on CursorHold
+autocmd CursorHold * silent call CocActionAsync('highlight')
+
+" Remap for rename current word
+nmap <leader>rn <Plug>(coc-rename)
+
+" Remap for format selected region
+vmap <leader>f  <Plug>(coc-format-selected)
+nmap <leader>f  <Plug>(coc-format-selected)
+
+augroup mygroup
+  autocmd!
+  " Setup formatexpr specified filetype(s).
+  autocmd FileType typescript,json setl formatexpr=CocAction('formatSelected')
+  " Update signature help on jump placeholder
+  autocmd User CocJumpPlaceholder call CocActionAsync('showSignatureHelp')
+augroup end
 
 command! -nargs=0 Prettier :CocCommand prettier.formatFile
 
@@ -144,13 +169,15 @@ let g:ale_fix_on_save = 1
 let g:ale_linters = {
 \   'javascript': ['eslint'],
 \   'typescript': ['tslint'],
-\   'ruby': ['rubocop']
+\   'ruby': ['rubocop'],
+\   'dart': ['language_server']
 \}
 
 let g:ale_fixers = {
 \   '*': ['remove_trailing_lines', 'trim_whitespace'],
 \   'javascript': ['prettier', 'eslint'],
-\   'typescript': ['prettier', 'tslint']
+\   'typescript': ['prettier', 'tslint'],
+\   'dart': ['dartfmt']
 \}
 
 
@@ -163,7 +190,6 @@ nmap <silent> <C-j> <Plug>(ale_next_wrap)
 
 Plug 'vim-ruby/vim-ruby'
 Plug 'tpope/vim-markdown'
-Plug 'iamcco/markdown-preview.nvim', { 'do': 'cd app & yarn install'  }
 Plug 'tpope/vim-rails'
 "Plug 'JSON.vim'
 Plug 'pangloss/vim-javascript'
@@ -173,17 +199,14 @@ Plug 'leafgarland/typescript-vim'
 Plug 'ekalinin/Dockerfile.vim'
 "Plug 'milch/vim-fastlane'
 Plug 'neoclide/jsonc.vim'
+Plug 'dart-lang/dart-vim-plugin'
 
 " EDITING
 " ==============================================================
 
-Plug 'tpope/vim-ragtag'
 Plug 'tpope/vim-repeat'
-Plug 'tpope/vim-unimpaired'
 Plug 'tpope/vim-sleuth'
-Plug 'tpope/vim-commentary'
 Plug 'tpope/vim-surround'
-Plug 'tpope/vim-endwise'
 
 
 " TEXT OBJECTS
@@ -196,7 +219,6 @@ Plug 'michaeljsmith/vim-indent-object'
 " TERMINAL & TESTS
 " ==============================================================
 
-Plug 'junegunn/vim-emoji'
 Plug 'kassio/neoterm'
 " {{{
   let g:neoterm_default_mod = ":botright"
@@ -223,7 +245,6 @@ Plug 'tpope/vim-git'
 Plug 'tpope/vim-fugitive'
 " {{{
   nnoremap <silent> <Leader>gb :Gblame<CR>
-  nnoremap <silent> <Leader>gd :Gdiff<CR>
 " }}}
 Plug 'tpope/vim-bundler'
 Plug 'kshenoy/vim-signature'
@@ -243,7 +264,7 @@ Plug 'maximbaz/lightline-ale'
     \   'right': []
     \ },
     \ 'separator': { 'left': '', 'right': '' },
-    \ 'subseparator': { 'left': '', 'right': '' }
+    \ 'subseparator': { 'left': '|', 'right': '|' }
     \ }
   let g:lightline.component_expand = {
       \  'linter_warnings': 'lightline#ale#warnings',
@@ -306,6 +327,8 @@ au FocusGained * silent! checktime
 
 set timeoutlen=500 " shorten the delay to wait when a mapped sequence is started
 
+set updatetime=750 " default is 4000; time before CursorHold and various 'inactive' things trigger
+
 " Split below and right
 set splitbelow
 set splitright
@@ -340,8 +363,6 @@ set foldmethod=manual
 set foldcolumn=4
 " Disable folding by default
 set nofoldenable
-" Enable folding by <Leader>f
-noremap <Leader>f :setlocal foldmethod=syntax foldcolumn=4<CR>
 
 
 " COLORSCHEME
@@ -357,7 +378,7 @@ call togglebg#map("<F4>")
 set cursorline
 set colorcolumn=200
 
-" CTags - refresh tags
+" CTags - refresh tags (replaced by gutentags)
 "map <Leader>c :!ctags --extra=+f --exclude=.git --exclude=log --exclude=compiled --exclude=tmp -R *<CR><CR>
 
 " Clear the current search highlight by pressing Esc
