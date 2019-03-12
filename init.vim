@@ -247,14 +247,13 @@ Plug 'tpope/vim-bundler'
 Plug 'kshenoy/vim-signature'
 
 Plug 'itchyny/lightline.vim'
-Plug 'maximbaz/lightline-ale'
 " {{{
   let g:lightline = {
     \ 'colorscheme': 'nord',
     \ 'active': {
     \   'left': [ [ 'mode', 'paste' ],
     \             [ 'gitbranch', 'readonly', 'relativepath', 'modified' ] ],
-    \   'right': [ [ 'linter_errors', 'linter_warnings', 'linter_ok' ], [ 'lineinfo' ], [ 'percent' ],
+    \   'right': [ [ 'lineinfo' ], [ 'percent' ],
     \              [ 'filetype' ] ]
     \ },
     \ 'inactive': {
@@ -264,11 +263,6 @@ Plug 'maximbaz/lightline-ale'
     \ 'separator': { 'left': '', 'right': '' },
     \ 'subseparator': { 'left': '|', 'right': '|' }
     \ }
-  let g:lightline.component_expand = {
-      \  'linter_warnings': 'lightline#ale#warnings',
-      \  'linter_errors': 'lightline#ale#errors',
-      \  'linter_ok': 'lightline#ale#ok',
-      \ }
   let g:lightline.component_type = {
       \     'linter_warnings': 'warning',
       \     'linter_errors': 'error',
@@ -277,9 +271,6 @@ Plug 'maximbaz/lightline-ale'
   let g:lightline.component_function = {
       \     'gitbranch': 'fugitive#head'
       \ }
-  let g:lightline#ale#indicator_warnings = "?"
-  let g:lightline#ale#indicator_errors = "!"
-  let g:lightline#ale#indicator_ok = "-"
   set noshowmode " Remove duplicate information
 " }}}
 
