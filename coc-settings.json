@@ -1,8 +1,8 @@
 {
+  "coc.preferences.formatOnSaveFiletypes": ["javascript", "javascript.jsx", "typescript", "typescript.tsx"],
   "suggest.enablePreview": true,
   "diagnostic.virtualText": true,
   "prettier.printWidth": 120,
-  "coc.preferences.formatOnSaveFiletypes": ["javascript", "javascript.jsx", "typescript", "typescript.tsx"],
   "languageserver": {
     "dart": {
       "command": "dart_language_server", // in windows is dart_language_server.bat

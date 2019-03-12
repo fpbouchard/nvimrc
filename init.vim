@@ -47,8 +47,8 @@ Plug 'junegunn/fzf.vim'
     \ 'header':  ['fg', 'Comment'] }
 
   autocmd! FileType fzf
-  autocmd  FileType fzf set laststatus=0 noshowmode noruler
-    \| autocmd BufLeave <buffer> set laststatus=2 showmode ruler
+  autocmd  FileType fzf set laststatus=0 noruler
+    \| autocmd BufLeave <buffer> set laststatus=2 ruler
 
   nnoremap <silent> <Leader><Leader> :Files<CR>
   nnoremap <silent> <Leader>b :Buffers<CR>
@@ -253,8 +253,8 @@ Plug 'itchyny/lightline.vim'
     \ 'colorscheme': 'nord',
     \ 'active': {
     \   'left': [ [ 'mode', 'paste' ],
-    \             [ 'gitbranch', 'readonly', 'relativepath', 'modified', 'coc_error', 'coc_warning', 'coc_hint', 'coc_info' ] ],
-    \   'right': [ [ 'lineinfo' ], [ 'percent' ],
+    \             [ 'gitbranch', 'readonly', 'relativepath', 'modified' ] ],
+    \   'right': [ [ 'coc_error', 'coc_warning', 'coc_hint', 'coc_info', 'lineinfo' ], [ 'percent' ],
     \              [ 'filetype' ]]
     \ },
     \ 'inactive': {
