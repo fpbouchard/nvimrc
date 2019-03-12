@@ -57,11 +57,6 @@ Plug 'junegunn/fzf.vim'
   nnoremap <silent> <leader>c  :Commits<CR>
   nnoremap <silent> <leader>cb :BCommits<CR>
 
-  " Mapping selecting mappings
-  nmap <leader><tab> <plug>(fzf-maps-n)
-  xmap <leader><tab> <plug>(fzf-maps-x)
-  omap <leader><tab> <plug>(fzf-maps-o)
-
   " Insert mode completion
   imap <c-x><c-k> <plug>(fzf-complete-word)
   imap <c-x><c-f> <plug>(fzf-complete-path)
@@ -110,6 +105,13 @@ endfunction
 " Use <c-space> for trigger completion.
 inoremap <silent><expr> <c-space> coc#refresh()
 
+set shortmess+=c
+set signcolumn=yes
+
+" Use `[c` and `]c` for navigate diagnostics
+nmap <silent> [c <Plug>(coc-diagnostic-prev)
+nmap <silent> ]c <Plug>(coc-diagnostic-next)
+
 " Use <cr> for confirm completion.
 " Coc only does snippet and additional edit on confirm.
 inoremap <expr> <cr> pumvisible() ? "\<C-y>" : "\<CR>"
@@ -157,32 +159,24 @@ augroup mygroup
   autocmd User CocJumpPlaceholder call CocActionAsync('showSignatureHelp')
 augroup end
 
-command! -nargs=0 Prettier :CocCommand prettier.formatFile
+" Using CocList
+" Show all diagnostics
+nnoremap <silent> <space>a  :<C-u>CocList diagnostics<cr>
+" Manage extensions
+nnoremap <silent> <space>e  :<C-u>CocList extensions<cr>
+" Show commands
+nnoremap <silent> <space>c  :<C-u>CocList commands<cr>
+" Find symbol of current document
+nnoremap <silent> <space>o  :<C-u>CocList outline<cr>
+" Search workspace symbols
+nnoremap <silent> <space>s  :<C-u>CocList -I symbols<cr>
+" Do default action for next item.
+nnoremap <silent> <space>j  :<C-u>CocNext<CR>
+" Do default action for previous item.
+nnoremap <silent> <space>k  :<C-u>CocPrev<CR>
+" Resume latest coc list
+nnoremap <silent> <space>p  :<C-u>CocListResume<CR>
 
-" }}}
-
-Plug 'w0rp/ale'
-" {{{
-let g:ale_sign_column_always = 1
-let g:ale_fix_on_save = 1
-
-let g:ale_linters = {
-\   'javascript': ['eslint'],
-\   'typescript': ['tslint'],
-\   'ruby': ['rubocop'],
-\   'dart': ['language_server']
-\}
-
-let g:ale_fixers = {
-\   '*': ['remove_trailing_lines', 'trim_whitespace'],
-\   'javascript': ['prettier', 'eslint'],
-\   'typescript': ['prettier', 'tslint'],
-\   'dart': ['dartfmt']
-\}
-
-
-nmap <silent> <C-k> <Plug>(ale_previous_wrap)
-nmap <silent> <C-j> <Plug>(ale_next_wrap)
 " }}}
 
 " LANGUAGES
@@ -200,6 +194,9 @@ Plug 'ekalinin/Dockerfile.vim'
 "Plug 'milch/vim-fastlane'
 Plug 'neoclide/jsonc.vim'
 Plug 'dart-lang/dart-vim-plugin'
+" {{{
+ let dart_format_on_save = 1
+" }}}
 
 " EDITING
 " ==============================================================
@@ -253,6 +250,7 @@ Plug 'itchyny/lightline.vim'
 Plug 'maximbaz/lightline-ale'
 " {{{
   let g:lightline = {
+    \ 'colorscheme': 'nord',
     \ 'active': {
     \   'left': [ [ 'mode', 'paste' ],
     \             [ 'gitbranch', 'readonly', 'relativepath', 'modified' ] ],
@@ -296,7 +294,9 @@ Plug 'ludovicchabant/vim-gutentags'
   let g:gutentags_file_list_command = 'rg --files'
 " }}}
 
-Plug 'frankier/neovim-colors-solarized-truecolor-only'
+"Plug 'frankier/neovim-colors-solarized-truecolor-only'
+"Plug 'morhetz/gruvbox'
+Plug 'arcticicestudio/nord-vim'
 
 call plug#end()
 
@@ -327,7 +327,7 @@ au FocusGained * silent! checktime
 
 set timeoutlen=500 " shorten the delay to wait when a mapped sequence is started
 
-set updatetime=750 " default is 4000; time before CursorHold and various 'inactive' things trigger
+set updatetime=300 " default is 4000; time before CursorHold and various 'inactive' things trigger
 
 " Split below and right
 set splitbelow
@@ -368,9 +368,15 @@ set nofoldenable
 " COLORSCHEME
 " ==============================================================
 set termguicolors
-colorscheme solarized
-set background=dark
-call togglebg#map("<F4>")
+
+colorscheme nord
+
+"let g:gruvbox_italic=1
+"colorscheme gruvbox
+
+"colorscheme solarized
+"set background=dark
+"call togglebg#map("<F4>")
 
 
 " MISC
