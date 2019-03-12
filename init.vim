@@ -248,6 +248,7 @@ Plug 'kshenoy/vim-signature'
 
 Plug 'itchyny/lightline.vim'
 " {{{
+
   let g:lightline = {
     \ 'colorscheme': 'nord',
     \ 'active': {
@@ -261,7 +262,7 @@ Plug 'itchyny/lightline.vim'
     \   'right': []
     \ },
     \ 'separator': { 'left': '', 'right': '' },
-    \ 'subseparator': { 'left': '|', 'right': '|' }
+    \ 'subseparator': { 'left': '', 'right': '' }
     \ }
   let g:lightline.component_type = {
       \     'linter_warnings': 'warning',
@@ -269,8 +270,21 @@ Plug 'itchyny/lightline.vim'
       \     'linter_ok': 'left',
       \ }
   let g:lightline.component_function = {
-      \     'gitbranch': 'fugitive#head'
+      \     'gitbranch': 'LightlineFugitive',
+      \     'readonly': 'LightlineReadonly'
       \ }
+
+  function! LightlineReadonly()
+    return &readonly ? '' : ''
+  endfunction
+  function! LightlineFugitive()
+    if exists('*fugitive#head')
+      let branch = fugitive#head()
+      return branch !=# '' ? ' '.branch : ''
+    endif
+    return ''
+  endfunction
+
   set noshowmode " Remove duplicate information
 " }}}
 
