@@ -87,6 +87,7 @@ Plug 'junegunn/fzf.vim'
 " AUTOCOMPLETE
 " ==============================================================
 
+"Plug 'neoclide/coc.nvim', {'tag': '*', 'do': { -> coc#util#install()}}
 Plug 'neoclide/coc.nvim', {'tag': '*', 'do': 'yarn install'}
 " {{{
 " Use tab for trigger completion with characters ahead and navigate.
@@ -393,8 +394,6 @@ set smartcase                     " But case-sensitive if expression contains a 
 " Set fold method -- currently 'manual' for performance reasons (dramatically
 " accelerates opening files like routes.rb)
 set foldmethod=manual
-" Enable a fold column
-set foldcolumn=4
 " Disable folding by default
 set nofoldenable
 
