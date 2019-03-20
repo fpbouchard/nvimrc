@@ -2,6 +2,7 @@
   "coc.preferences.formatOnSaveFiletypes": ["javascript", "javascript.jsx", "typescript", "typescript.tsx"],
   "suggest.enablePreview": true,
   "diagnostic.virtualText": true,
+  "diagnostic.virtualTextPrefix": " > ",
   "prettier.printWidth": 120,
   "languageserver": {
     "dart": {
