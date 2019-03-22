@@ -84,8 +84,34 @@ Plug 'junegunn/fzf.vim'
 " }}}
 
 
-" AUTOCOMPLETE
+" AUTOCOMPLETE/LINT
 " ==============================================================
+"
+Plug 'w0rp/ale'
+" {{{
+let g:ale_sign_column_always = 1
+let g:ale_fix_on_save = 1
+let g:ale_linters_explicit = 1
+
+let g:ale_linters = {
+  \   'javascript': ['eslint'],
+  \   'typescript': ['tslint'],
+  \   'ruby': ['rubocop'],
+  \   'dart': ['language_server']
+  \}
+
+let g:ale_fixers = {
+\   '*': ['remove_trailing_lines', 'trim_whitespace'],
+\   'javascript': ['eslint'],
+\   'typescript': ['prettier', 'tslint'],
+\   'ruby': ['rubocop'],
+\   'dart': ['dartfmt']
+\}
+
+nmap <silent> <C-k> <Plug>(ale_previous_wrap)
+nmap <silent> <C-j> <Plug>(ale_next_wrap)
+" }}}
+
 
 "Plug 'neoclide/coc.nvim', {'tag': '*', 'do': { -> coc#util#install()}}
 Plug 'neoclide/coc.nvim', {'tag': '*', 'do': 'yarn install'}
@@ -195,9 +221,6 @@ Plug 'ekalinin/Dockerfile.vim'
 "Plug 'milch/vim-fastlane'
 Plug 'neoclide/jsonc.vim'
 Plug 'dart-lang/dart-vim-plugin'
-" {{{
- let dart_format_on_save = 1
-" }}}
 
 " EDITING
 " ==============================================================
