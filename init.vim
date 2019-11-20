@@ -95,17 +95,20 @@ let g:ale_linters_explicit = 1
 
 let g:ale_linters = {
   \   'javascript': ['eslint'],
-  \   'typescript': ['tslint'],
+  \   'typescript': [],
   \   'ruby': ['rubocop'],
-  \   'dart': ['language_server']
+  \   'dart': ['language_server'],
+  \   'json': ['jsonlint']
   \}
 
 let g:ale_fixers = {
 \   '*': ['remove_trailing_lines', 'trim_whitespace'],
 \   'javascript': ['eslint'],
-\   'typescript': ['prettier', 'tslint'],
+\   'typescript': [],
 \   'ruby': ['rubocop'],
-\   'dart': ['dartfmt']
+\   'dart': ['dartfmt'],
+\   'json': ['fixjson'],
+\   'vue': ['prettier']
 \}
 
 nmap <silent> <C-k> <Plug>(ale_previous_wrap)
@@ -113,8 +116,9 @@ nmap <silent> <C-j> <Plug>(ale_next_wrap)
 " }}}
 
 
+Plug 'neoclide/coc.nvim', {'branch': 'release'}
 "Plug 'neoclide/coc.nvim', {'tag': '*', 'do': { -> coc#util#install()}}
-Plug 'neoclide/coc.nvim', {'tag': '*', 'do': 'yarn install'}
+"Plug 'neoclide/coc.nvim', {'tag': '*', 'do': 'yarn install'}
 " {{{
 " Use tab for trigger completion with characters ahead and navigate.
 " Use command ':verbose imap <tab>' to make sure tab is not mapped by other plugin.
@@ -221,6 +225,7 @@ Plug 'ekalinin/Dockerfile.vim'
 "Plug 'milch/vim-fastlane'
 Plug 'neoclide/jsonc.vim'
 Plug 'dart-lang/dart-vim-plugin'
+Plug 'posva/vim-vue'
 
 " EDITING
 " ==============================================================
@@ -266,6 +271,7 @@ Plug 'tpope/vim-git'
 Plug 'tpope/vim-fugitive'
 " {{{
   nnoremap <silent> <Leader>gb :Gblame<CR>
+  nnoremap <silent> <Leader>gf :Gdiff<CR>
 " }}}
 Plug 'tpope/vim-bundler'
 Plug 'kshenoy/vim-signature'
@@ -286,7 +292,7 @@ Plug 'itchyny/lightline.vim'
     \   'right': []
     \ },
     \ 'separator': { 'left': '', 'right': '' },
-    \ 'subseparator': { 'left': '│', 'right': '│' }
+    \ 'subseparator': { 'left': '', 'right': '' }
     \ }
   let g:lightline.component_function = {
     \ 'gitbranch': 'fugitive#head'
@@ -463,6 +469,13 @@ endfunction
 " ==============================================================
 "set guicursor=n-v-c:block-Cursor/lCursor-blinkon0,i-ci:ver25-Cursor/lCursor,r-cr:hor20-Cursor/lCursor
 set guicursor=n-v-c:block,i-ci-ve:ver25,r-cr:hor20,o:hor50,a:blinkwait700-blinkoff400-blinkon250-Cursor/lCursor,sm:block-blinkwait175-blinkoff150-blinkon175
+
+" prettier
+command! -nargs=0 Prettier :call CocAction('runCommand', 'prettier.formatFile')
+
+" re-highlight vue files from start when opening
+" https://github.com/posva/vim-vue#my-syntax-highlighting-stops-working-randomly
+autocmd FileType vue syntax sync fromstart
 
 
 if filereadable(glob("~/.nvimrc.local"))
