@@ -6,10 +6,20 @@
   "git.addGBlameToBufferVar": true,
   "prettier.printWidth": 120,
   "prettier.eslintIntegration": true,
+  "eslint.filetypes": [
+    "javascript",
+    "javascriptreact",
+    "typescript",
+    "typescriptreact",
+    "vue"
+  ],
   "solargraph.useBundler": true,
-  "vetur.validation.template": false,
-  "vetur.format.defaultFormatter.js": "prettier",
+  "vetur.dev.vlsPath": "/usr/local/lib/node_modules/vls",
+  "vetur.format.defaultFormatter.html": "prettier",
+  "vetur.format.defaultFormatter.js": "prettier-eslint",
+  "vetur.trace.server": "verbose",
   "codeLens.enable": true,
+  "omnisharp.trace.server": "verbose",
   "languageserver": {
     "dart": {
       "command": "dart_language_server", // in windows is dart_language_server.bat
@@ -22,6 +32,11 @@
           "completion": {}
         }
       }
+    },
+    "terraform": {
+      "command": "terraform-lsp",
+      "filetypes": ["terraform"],
+      "initializationOptions": {}
     }
   }
 }

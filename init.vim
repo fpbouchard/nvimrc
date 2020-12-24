@@ -6,10 +6,10 @@
 
 " Autoinstall vim-plug
 " {{{
-if empty(glob('~/.config/nvim/autoload/plug.vim'))
-  silent !curl -fLo ~/.config/nvim/autoload/plug.vim --create-dirs
-      \ https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
-  autocmd VimEnter * PlugInstall
+if empty(glob('~/.vim/autoload/plug.vim'))
+  silent !curl -fLo ~/.vim/autoload/plug.vim --create-dirs
+    \ https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
+  autocmd VimEnter * PlugInstall --sync | source $MYVIMRC
 endif
 " }}}
 call plug#begin('~/.nvim/plugged')
@@ -21,12 +21,10 @@ call plug#begin('~/.nvim/plugged')
 Plug 'justinmk/vim-dirvish'
 Plug 'kristijanhusak/vim-dirvish-git'
 
+Plug 'junegunn/fzf.vim'
 Plug 'junegunn/fzf', { 'dir': '~/.fzf', 'do': './install --all' }
 " {{{
   let $FZF_DEFAULT_OPTS .= ' --inline-info'
-" }}}
-Plug 'junegunn/fzf.vim'
-" {{{
   let g:fzf_commits_log_options = '--color=always
     \ --format="%C(yellow)%h%C(red)%d%C(reset)
     \ - %C(bold green)(%ar)%C(reset) %s %C(blue)<%an>%C(reset)"'
@@ -211,10 +209,12 @@ augroup mygroup
   autocmd User CocJumpPlaceholder call CocActionAsync('showSignatureHelp')
 augroup end
 
-" Applying codeAction to the selected region.
-" Example: `<leader>aap` for current paragraph
-xmap <leader>a  <Plug>(coc-codeaction-selected)
-nmap <leader>a  <Plug>(coc-codeaction-selected)
+" Remap for do codeAction of selected region
+function! s:cocActionsOpenFromSelected(type) abort
+  execute 'CocCommand actions.open ' . a:type
+endfunction
+xmap <silent> <leader>a :<C-u>execute 'CocCommand actions.open ' . visualmode()<CR>
+nmap <silent> <leader>a :<C-u>set operatorfunc=<SID>cocActionsOpenFromSelected<CR>g@
 
 " Remap keys for applying codeAction to the current line.
 nmap <leader>ac  <Plug>(coc-codeaction)
@@ -274,22 +274,13 @@ nnoremap <silent> <space>p  :<C-u>CocListResume<CR>
 " LANGUAGES
 " ==============================================================
 
-Plug 'vim-ruby/vim-ruby'
-Plug 'tpope/vim-markdown'
-Plug 'tpope/vim-rails'
-"Plug 'JSON.vim'
-Plug 'pangloss/vim-javascript'
-"Plug 'mxw/vim-jsx'
-"Plug 'ianks/vim-tsx'
-Plug 'leafgarland/typescript-vim'
-Plug 'ekalinin/Dockerfile.vim'
-"Plug 'milch/vim-fastlane'
-Plug 'neoclide/jsonc.vim'
-Plug 'dart-lang/dart-vim-plugin'
-Plug 'posva/vim-vue'
+Plug 'sheerun/vim-polyglot'
+"Plug 'nvim-treesitter/nvim-treesitter'
 
-Plug 'luochen1990/rainbow'
-let g:rainbow_active = 1
+"Plug 'tpope/vim-rails'
+
+"Plug 'luochen1990/rainbow'
+"let g:rainbow_active = 1
 
 " EDITING
 " ==============================================================
@@ -424,8 +415,6 @@ Plug 'ludovicchabant/vim-gutentags'
 " }}}
 
 
-"Plug 'frankier/neovim-colors-solarized-truecolor-only'
-"Plug 'morhetz/gruvbox'
 Plug 'arcticicestudio/nord-vim'
 
 call plug#end()
