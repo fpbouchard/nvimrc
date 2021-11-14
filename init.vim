@@ -21,75 +21,26 @@ call plug#begin('~/.nvim/plugged')
 Plug 'justinmk/vim-dirvish'
 Plug 'kristijanhusak/vim-dirvish-git'
 
-Plug 'junegunn/fzf.vim'
-Plug 'junegunn/fzf', { 'dir': '~/.fzf', 'do': './install --all' }
-" {{{
-  let $FZF_DEFAULT_OPTS .= ' --inline-info'
-  let g:fzf_commits_log_options = '--color=always
-    \ --format="%C(yellow)%h%C(red)%d%C(reset)
-    \ - %C(bold green)(%ar)%C(reset) %s %C(blue)<%an>%C(reset)"'
+Plug 'nvim-lua/popup.nvim'
+Plug 'nvim-lua/plenary.nvim'
+Plug 'nvim-telescope/telescope.nvim'
 
-  " Customize fzf colors to match your color scheme
-  let g:fzf_colors =
-  \ { 'fg':      ['fg', 'Normal'],
-    \ 'bg':      ['bg', 'Normal'],
-    \ 'hl':      ['fg', 'Comment'],
-    \ 'fg+':     ['fg', 'CursorLine', 'CursorColumn', 'Normal'],
-    \ 'bg+':     ['bg', 'CursorLine', 'CursorColumn'],
-    \ 'hl+':     ['fg', 'Statement'],
-    \ 'info':    ['fg', 'PreProc'],
-    \ 'border':  ['fg', 'Ignore'],
-    \ 'prompt':  ['fg', 'Conditional'],
-    \ 'pointer': ['fg', 'Exception'],
-    \ 'marker':  ['fg', 'Keyword'],
-    \ 'spinner': ['fg', 'Label'],
-    \ 'header':  ['fg', 'Comment'] }
-
-  autocmd! FileType fzf
-  autocmd  FileType fzf set laststatus=0 noruler
-    \| autocmd BufLeave <buffer> set laststatus=2 ruler
-
-  nnoremap <silent> <Leader><Leader> :Files<CR>
-  nnoremap <silent> <Leader>b :Buffers<CR>
-  nnoremap <silent> <Leader>o :BTags<CR>
-  nnoremap <silent> <Leader>t :Tags<CR>
-  nnoremap <silent> <leader>c  :Commits<CR>
-  nnoremap <silent> <leader>cb :BCommits<CR>
-
-  " Insert mode completion
-  imap <c-x><c-k> <plug>(fzf-complete-word)
-  imap <c-x><c-f> <plug>(fzf-complete-path)
-  imap <c-x><c-l> <plug>(fzf-complete-line)
-
-  " Global line completion (not just open buffers. ripgrep required.)
-  inoremap <expr> <c-x><c-l> fzf#vim#complete(fzf#wrap({
-    \ 'prefix': '^.*$',
-    \ 'source': 'rg -n ^ --color always',
-    \ 'options': '--ansi --delimiter : --nth 3..',
-    \ 'reducer': { lines -> join(split(lines[0], ':\zs')[2:], '') }}))
-
-  " Rg with preview
-  command! -bang -nargs=* Rg
-    \ call fzf#vim#grep(
-    \   'rg --column --line-number --no-heading --color=always --smart-case '.shellescape(<q-args>), 1,
-    \   fzf#vim#with_preview('right:50%', '?'),
-    \   <bang>0)
-
-  nnoremap <silent> <Leader>rg :Rg <C-R><C-W><C-R><CR><CR>
-
-  " Files command with preview window
-  command! -bang -nargs=? -complete=dir Files
-    \ call fzf#vim#files(<q-args>, fzf#vim#with_preview(), <bang>0)
-" }}}
-
+" Find files using Telescope command-line sugar.
+" nnoremap <leader><leader> <cmd>lua require('telescope.builtin').find_files()<cr>
+nnoremap <leader>rs <cmd>lua require('telescope.builtin').grep_string()<cr>
+nnoremap <leader>rg <cmd>lua require('telescope.builtin').live_grep()<cr>
+nnoremap <leader>b <cmd>lua require('telescope.builtin').buffers()<cr>
+nnoremap <leader>h <cmd>lua require('telescope.builtin').help_tags()<cr>
+nnoremap <leader>s <cmd>lua require('telescope.builtin').treesitter()<cr>
+nnoremap <leader>w <cmd>lua require('telescope.builtin').file_browser()<cr>
 
 " AUTOCOMPLETE/LINT
 " ==============================================================
 "
-Plug 'w0rp/ale'
+Plug 'dense-analysis/ale'
 " {{{
 let g:ale_sign_column_always = 0
-let g:ale_fix_on_save = 0
+let g:ale_fix_on_save = 1
 let g:ale_linters_explicit = 1
 
 let g:ale_linters = {
@@ -97,7 +48,8 @@ let g:ale_linters = {
   \   'typescript': [],
   \   'ruby': ['rubocop'],
   \   'dart': [],
-  \   'json': ['jsonlint']
+  \   'json': ['jsonlint'],
+  \   'terraform': []
   \}
 
 let g:ale_fixers = {
@@ -107,7 +59,8 @@ let g:ale_fixers = {
 \   'ruby': ['rubocop'],
 \   'dart': ['dartfmt'],
 \   'json': ['fixjson'],
-\   'vue': ['prettier']
+\   'vue': [],
+\   'terraform': ['terraform']
 \}
 
 nmap <silent> <C-k> <Plug>(ale_previous_wrap)
@@ -137,7 +90,7 @@ set shortmess+=c
 
 " Always show the signcolumn, otherwise it would shift the text each time
 " diagnostics appear/become resolved.
-if has("patch-8.1.1564")
+if has("nvim-0.5.0") || has("patch-8.1.1564")
   " Recently vim can merge signcolumn and number column into one
   set signcolumn=number
 else
@@ -159,16 +112,16 @@ function! s:check_back_space() abort
 endfunction
 
 " Use <c-space> to trigger completion.
-inoremap <silent><expr> <c-space> coc#refresh()
-
-" Use <cr> to confirm completion, `<C-g>u` means break undo chain at current
-" position. Coc only does snippet and additional edit on confirm.
-" <cr> could be remapped by other vim plugin, try `:verbose imap <CR>`.
-if exists('*complete_info')
-  inoremap <expr> <cr> complete_info()["selected"] != "-1" ? "\<C-y>" : "\<C-g>u\<CR>"
+if has('nvim')
+  inoremap <silent><expr> <c-space> coc#refresh()
 else
-  inoremap <expr> <cr> pumvisible() ? "\<C-y>" : "\<C-g>u\<CR>"
+  inoremap <silent><expr> <c-@> coc#refresh()
 endif
+
+" Make <CR> auto-select the first completion item and notify coc.nvim to
+" format on enter, <cr> could be remapped by other vim plugin
+inoremap <silent><expr> <cr> pumvisible() ? coc#_select_confirm()
+                              \: "\<C-g>u\<CR>\<c-r>=coc#on_enter()\<CR>"
 
 " Use `[g` and `]g` to navigate diagnostics
 nmap <silent> [g <Plug>(coc-diagnostic-prev)
@@ -186,8 +139,10 @@ nnoremap <silent> K :call <SID>show_documentation()<CR>
 function! s:show_documentation()
   if (index(['vim','help'], &filetype) >= 0)
     execute 'h '.expand('<cword>')
+  elseif (coc#rpc#ready())
+    call CocActionAsync('doHover')
   else
-    call CocAction('doHover')
+    execute '!' . &keywordprg . " " . expand('<cword>')
   endif
 endfunction
 
@@ -209,14 +164,12 @@ augroup mygroup
   autocmd User CocJumpPlaceholder call CocActionAsync('showSignatureHelp')
 augroup end
 
-" Remap for do codeAction of selected region
-function! s:cocActionsOpenFromSelected(type) abort
-  execute 'CocCommand actions.open ' . a:type
-endfunction
-xmap <silent> <leader>a :<C-u>execute 'CocCommand actions.open ' . visualmode()<CR>
-nmap <silent> <leader>a :<C-u>set operatorfunc=<SID>cocActionsOpenFromSelected<CR>g@
+" Applying codeAction to the selected region.
+" Example: `<leader>aap` for current paragraph
+xmap <leader>a  <Plug>(coc-codeaction-selected)
+nmap <leader>a  <Plug>(coc-codeaction-selected)
 
-" Remap keys for applying codeAction to the current line.
+" Remap keys for applying codeAction to the current buffer.
 nmap <leader>ac  <Plug>(coc-codeaction)
 " Apply AutoFix to problem on the current line.
 nmap <leader>qf  <Plug>(coc-fix-current)
@@ -231,6 +184,16 @@ xmap ic <Plug>(coc-classobj-i)
 omap ic <Plug>(coc-classobj-i)
 xmap ac <Plug>(coc-classobj-a)
 omap ac <Plug>(coc-classobj-a)
+
+" Remap <C-f> and <C-b> for scroll float windows/popups.
+if has('nvim-0.4.0') || has('patch-8.2.0750')
+  nnoremap <silent><nowait><expr> <C-f> coc#float#has_scroll() ? coc#float#scroll(1) : "\<C-f>"
+  nnoremap <silent><nowait><expr> <C-b> coc#float#has_scroll() ? coc#float#scroll(0) : "\<C-b>"
+  inoremap <silent><nowait><expr> <C-f> coc#float#has_scroll() ? "\<c-r>=coc#float#scroll(1)\<cr>" : "\<Right>"
+  inoremap <silent><nowait><expr> <C-b> coc#float#has_scroll() ? "\<c-r>=coc#float#scroll(0)\<cr>" : "\<Left>"
+  vnoremap <silent><nowait><expr> <C-f> coc#float#has_scroll() ? coc#float#scroll(1) : "\<C-f>"
+  vnoremap <silent><nowait><expr> <C-b> coc#float#has_scroll() ? coc#float#scroll(0) : "\<C-b>"
+endif
 
 " Use CTRL-S for selections ranges.
 " Requires 'textDocument/selectionRange' support of LS, ex: coc-tsserver
@@ -274,13 +237,10 @@ nnoremap <silent> <space>p  :<C-u>CocListResume<CR>
 " LANGUAGES
 " ==============================================================
 
+
+Plug 'nvim-treesitter/nvim-treesitter', { 'branch': '0.5-compat', 'do': ':TSUpdate' }
+Plug 'nvim-treesitter/playground'
 Plug 'sheerun/vim-polyglot'
-"Plug 'nvim-treesitter/nvim-treesitter'
-
-"Plug 'tpope/vim-rails'
-
-"Plug 'luochen1990/rainbow'
-"let g:rainbow_active = 1
 
 " EDITING
 " ==============================================================
@@ -325,8 +285,8 @@ Plug 'janko-m/vim-test'
 Plug 'tpope/vim-git'
 Plug 'tpope/vim-fugitive'
 " {{{
-  nnoremap <silent> <Leader>gb :Gblame<CR>
-  nnoremap <silent> <Leader>gf :Gdiff<CR>
+  nnoremap <silent> <Leader>gb :Git blame<CR>
+  nnoremap <silent> <Leader>gf :Git diff<CR>
 " }}}
 Plug 'tpope/vim-bundler'
 Plug 'kshenoy/vim-signature'
@@ -341,6 +301,10 @@ Plug 'itchyny/lightline.vim'
     \             [ 'gitbranch', 'readonly', 'relativepath', 'modified' ] ],
     \   'right': [ [ 'coc_error', 'coc_warning', 'coc_hint', 'coc_info', 'lineinfo' ], [ 'percent' ],
     \              [ 'blame', 'filetype' ]]
+    \ },
+    \ 'tabline': {
+    \   'left': [ [ 'buffers' ] ],
+    \   'right': [ [ 'close' ] ]
     \ },
     \ 'inactive': {
     \   'left': [ ['relativepath'] ],
@@ -359,14 +323,16 @@ Plug 'itchyny/lightline.vim'
     \ 'coc_warning' : 'LightlineCocWarnings',
     \ 'coc_info'    : 'LightlineCocInfos',
     \ 'coc_hint'    : 'LightlineCocHints',
-    \ 'coc_fix'     : 'LightlineCocFixes'
+    \ 'coc_fix'     : 'LightlineCocFixes',
+    \ 'buffers'     : 'lightline#bufferline#buffers'
     \ }
   let g:lightline.component_type = {
     \ 'coc_error'   : 'error',
     \ 'coc_warning' : 'warning',
     \ 'coc_info'    : 'tabsel',
     \ 'coc_hint'    : 'middle',
-    \ 'coc_fix'     : 'middle'
+    \ 'coc_fix'     : 'middle',
+    \ 'buffers'     : 'tabsel'
     \ }
 
   function! s:lightline_coc_diagnostic(kind, sign) abort
@@ -408,14 +374,32 @@ Plug 'itchyny/lightline.vim'
 
   set noshowmode " Remove duplicate information
 " }}}
+Plug 'mengelbrecht/lightline-bufferline'
+" {{{
+  let g:lightline#bufferline#enable_devicons = 1
+  let g:lightline#bufferline#show_number = 2
+
+  nmap <Leader>1 <Plug>lightline#bufferline#go(1)
+  nmap <Leader>2 <Plug>lightline#bufferline#go(2)
+  nmap <Leader>3 <Plug>lightline#bufferline#go(3)
+  nmap <Leader>4 <Plug>lightline#bufferline#go(4)
+  nmap <Leader>5 <Plug>lightline#bufferline#go(5)
+  nmap <Leader>6 <Plug>lightline#bufferline#go(6)
+  nmap <Leader>7 <Plug>lightline#bufferline#go(7)
+  nmap <Leader>8 <Plug>lightline#bufferline#go(8)
+  nmap <Leader>9 <Plug>lightline#bufferline#go(9)
+  nmap <Leader>0 <Plug>lightline#bufferline#go(10)
+" }}}
 
 Plug 'ludovicchabant/vim-gutentags'
 " {{{
   let g:gutentags_file_list_command = 'rg --files'
 " }}}
 
+Plug 'kyazdani42/nvim-web-devicons' " If you want devicons
+Plug 'christianchiarulli/nvcode-color-schemes.vim'
+" Plug 'arcticicestudio/nord-vim'
 
-Plug 'arcticicestudio/nord-vim'
 
 call plug#end()
 
@@ -458,6 +442,8 @@ set splitright
 set list
 set listchars=tab:>-,trail:·,extends:>,precedes:<,nbsp:+
 
+set showtabline=2
+
 " INDENTATION
 " ==============================================================
 set expandtab     " replace <Tab> with spaces
@@ -477,12 +463,9 @@ set smartcase                     " But case-sensitive if expression contains a 
 
 " FOLDING
 " ==============================================================
-" Set fold method -- currently 'manual' for performance reasons (dramatically
-" accelerates opening files like routes.rb)
-set foldmethod=manual
-" Disable folding by default
-set nofoldenable
-
+set foldmethod=expr
+set foldexpr=nvim_treesitter#foldexpr()
+set foldlevel=99
 
 " COLORSCHEME
 " ==============================================================
@@ -502,6 +485,65 @@ colorscheme nord
 " ==============================================================
 set cursorline
 set colorcolumn=200
+
+" Initialize LUA plugins
+lua <<EOF
+-- Tree Sitter
+require'nvim-treesitter.configs'.setup {
+  ensure_installed = "maintained", -- one of "all", "maintained" (parsers with maintainers), or a list of languages
+  highlight = { enable = true },
+  incremental_selection = { enable = true },
+  textobjects = { enable = true },
+  indent = {
+    enable = true,
+    disable = { "vue" }
+  },
+  playground = {
+    enable = true,
+    disable = {},
+    updatetime = 25, -- Debounced time for highlighting nodes in the playground from source code
+    persist_queries = false, -- Whether the query persists across vim sessions
+    keybindings = {
+      toggle_query_editor = 'o',
+      toggle_hl_groups = 'i',
+      toggle_injected_languages = 't',
+      toggle_anonymous_nodes = 'a',
+      toggle_language_display = 'I',
+      focus_language = 'f',
+      unfocus_language = 'F',
+      update = 'R',
+      goto_node = '<cr>',
+      show_help = '?',
+    },
+  }
+}
+
+-- Telescope
+local actions = require('telescope.actions')
+require('telescope').setup{
+  defaults = {
+    mappings = {
+      i = {
+        ["<C-j>"] = actions.move_selection_next,
+        ["<C-k>"] = actions.move_selection_previous,
+        ["<esc>"] = actions.close,
+      },
+      n = {
+      },
+    },
+  }
+}
+
+-- find_files does not find hidden files, but if passed with the hidden: true flag, will show .git folder. Fix:
+-- https://www.reddit.com/r/neovim/comments/nspg8o/telescope_find_files_not_showing_hidden_files/
+-- https://github.com/skbolton/titan/blob/4d0d31cc6439a7565523b1018bec54e3e8bc502c/nvim/nvim/lua/mappings/filesystem.lua#L6
+local map = vim.api.nvim_set_keymap
+local default_opts = {noremap = true}
+map('n', '<leader><leader>', "<cmd>lua require'telescope.builtin'.find_files({ find_command = {'rg', '--files', '--hidden', '-g', '!.git' }})<cr>", default_opts)
+
+
+EOF
+
 
 " CTags - refresh tags (replaced by gutentags)
 "map <Leader>c :!ctags --extra=+f --exclude=.git --exclude=log --exclude=compiled --exclude=tmp -R *<CR><CR>
