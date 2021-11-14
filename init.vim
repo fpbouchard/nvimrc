@@ -97,6 +97,27 @@ else
   set signcolumn=yes
 endif
 
+let g:coc_global_extensions = [
+      \'@yaegassy/coc-volar',
+      \'coc-actions',
+      \'coc-css',
+      \'coc-flutter',
+      \'coc-git',
+      \'coc-html',
+      \'coc-java',
+      \'coc-json',
+      \'coc-markdownlint',
+      \'coc-marketplace',
+      \'coc-omnisharp',
+      \'coc-pairs',
+      \'coc-prettier',
+      \'coc-solargraph',
+      \'coc-tsserver',
+      \'coc-vetur',
+      \'coc-webpack',
+      \'coc-yaml'
+      \]
+
 " Use tab for trigger completion with characters ahead and navigate.
 " NOTE: Use command ':verbose imap <tab>' to make sure tab is not mapped by
 " other plugin before putting this into your config.
