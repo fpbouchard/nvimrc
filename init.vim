@@ -23,10 +23,11 @@ Plug 'kristijanhusak/vim-dirvish-git'
 
 Plug 'nvim-lua/popup.nvim'
 Plug 'nvim-lua/plenary.nvim'
+Plug 'nvim-telescope/telescope-fzf-native.nvim', { 'do': 'make' }
 Plug 'nvim-telescope/telescope.nvim'
 
 " Find files using Telescope command-line sugar.
-" nnoremap <leader><leader> <cmd>lua require('telescope.builtin').find_files()<cr>
+nnoremap <leader><leader> <cmd>lua require('telescope.builtin').find_files()<cr>
 nnoremap <leader>rs <cmd>lua require('telescope.builtin').grep_string()<cr>
 nnoremap <leader>rg <cmd>lua require('telescope.builtin').live_grep()<cr>
 nnoremap <leader>b <cmd>lua require('telescope.builtin').buffers()<cr>
@@ -281,11 +282,6 @@ Plug 'michaeljsmith/vim-indent-object'
 " TERMINAL & TESTS
 " ==============================================================
 
-Plug 'kassio/neoterm'
-" {{{
-  let g:neoterm_default_mod = ":botright"
-  let g:neoterm_autoscroll = 1
-" }}}
 Plug 'janko-m/vim-test'
 " {{{
   nmap <silent> <leader>A :TestSuite<CR>
@@ -296,7 +292,7 @@ Plug 'janko-m/vim-test'
   " Easier to just press C-o to switch to normal mode in terminal
   tmap <C-o> <C-\><C-n>
 
-  let test#strategy = "neoterm"
+  let test#strategy = "kitty"
 " }}}
 
 
@@ -549,20 +545,28 @@ require('telescope').setup{
         ["<C-k>"] = actions.move_selection_previous,
         ["<esc>"] = actions.close,
       },
-      n = {
-      },
     },
+    vimgrep_arguments = {
+      "rg",
+      "--color=never",
+      "--no-heading",
+      "--with-filename",
+      "--line-number",
+      "--column",
+      "--smart-case",
+      "--hidden"
+    }
+  },
+  pickers = {
+    find_files = {
+      hidden = true
+    },
+    buffers = {
+      sort_lastused = true
+    }
   }
 }
-
--- find_files does not find hidden files, but if passed with the hidden: true flag, will show .git folder. Fix:
--- https://www.reddit.com/r/neovim/comments/nspg8o/telescope_find_files_not_showing_hidden_files/
--- https://github.com/skbolton/titan/blob/4d0d31cc6439a7565523b1018bec54e3e8bc502c/nvim/nvim/lua/mappings/filesystem.lua#L6
-local map = vim.api.nvim_set_keymap
-local default_opts = {noremap = true}
-map('n', '<leader><leader>', "<cmd>lua require'telescope.builtin'.find_files({ find_command = {'rg', '--files', '--hidden', '-g', '!.git' }})<cr>", default_opts)
-
-
+require('telescope').load_extension('fzf')
 EOF
 
 

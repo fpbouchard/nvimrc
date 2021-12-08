@@ -8,6 +8,9 @@
   "solargraph.useBundler": true,
   "codeLens.enable": true,
   "omnisharp.trace.server": "verbose",
+  "markdownlint.config": {
+    "line_length": false
+  },
   "languageserver": {
     "terraform": {
       "command": "terraform-ls",
@@ -18,5 +21,6 @@
   },
   "typescript.format.enabled": false,
   "javascript.format.enabled": false,
-  "tsserver.log": "verbose"
+  "tsserver.log": "verbose",
+  "java.format.settings.url": "/Users/fpbouchard/.config/coc/extensions/node_modules/redhat.java/eclipse-formatter.xml"
 }
