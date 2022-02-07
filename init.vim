@@ -20,6 +20,7 @@ call plug#begin('~/.nvim/plugged')
 
 Plug 'justinmk/vim-dirvish'
 Plug 'kristijanhusak/vim-dirvish-git'
+Plug 'roginfarrer/vim-dirvish-dovish', {'branch': 'main'}
 
 Plug 'nvim-lua/popup.nvim'
 Plug 'nvim-lua/plenary.nvim'
@@ -32,8 +33,7 @@ nnoremap <leader>rs <cmd>lua require('telescope.builtin').grep_string()<cr>
 nnoremap <leader>rg <cmd>lua require('telescope.builtin').live_grep()<cr>
 nnoremap <leader>b <cmd>lua require('telescope.builtin').buffers()<cr>
 nnoremap <leader>h <cmd>lua require('telescope.builtin').help_tags()<cr>
-nnoremap <leader>s <cmd>lua require('telescope.builtin').treesitter()<cr>
-nnoremap <leader>w <cmd>lua require('telescope.builtin').file_browser()<cr>
+nnoremap <leader>o <cmd>lua require('telescope.builtin').treesitter()<cr>
 
 " AUTOCOMPLETE/LINT
 " ==============================================================
@@ -58,7 +58,7 @@ let g:ale_fixers = {
 \   'javascript': [],
 \   'typescript': [],
 \   'ruby': ['rubocop'],
-\   'dart': ['dartfmt'],
+\   'dart': [],
 \   'json': ['fixjson'],
 \   'vue': [],
 \   'terraform': ['terraform']
@@ -114,7 +114,6 @@ let g:coc_global_extensions = [
       \'coc-prettier',
       \'coc-solargraph',
       \'coc-tsserver',
-      \'coc-vetur',
       \'coc-webpack',
       \'coc-yaml'
       \]
@@ -167,9 +166,6 @@ function! s:show_documentation()
     execute '!' . &keywordprg . " " . expand('<cword>')
   endif
 endfunction
-
-" Highlight the symbol and its references when holding the cursor.
-autocmd CursorHold * silent call CocActionAsync('highlight')
 
 " Symbol renaming.
 nmap <leader>rn <Plug>(coc-rename)
@@ -260,9 +256,9 @@ nnoremap <silent> <space>p  :<C-u>CocListResume<CR>
 " ==============================================================
 
 
-Plug 'nvim-treesitter/nvim-treesitter', { 'branch': '0.5-compat', 'do': ':TSUpdate' }
+Plug 'nvim-treesitter/nvim-treesitter', { 'do': ':TSUpdate' }
 Plug 'nvim-treesitter/playground'
-Plug 'sheerun/vim-polyglot'
+" Plug 'sheerun/vim-polyglot'
 
 " EDITING
 " ==============================================================
@@ -282,7 +278,7 @@ Plug 'michaeljsmith/vim-indent-object'
 " TERMINAL & TESTS
 " ==============================================================
 
-Plug 'janko-m/vim-test'
+Plug 'vim-test/vim-test'
 " {{{
   nmap <silent> <leader>A :TestSuite<CR>
   nmap <silent> <leader>r :TestNearest<CR>
@@ -293,6 +289,7 @@ Plug 'janko-m/vim-test'
   tmap <C-o> <C-\><C-n>
 
   let test#strategy = "kitty"
+  let test#java#runner = 'gradletest'
 " }}}
 
 
@@ -508,12 +505,15 @@ lua <<EOF
 -- Tree Sitter
 require'nvim-treesitter.configs'.setup {
   ensure_installed = "maintained", -- one of "all", "maintained" (parsers with maintainers), or a list of languages
-  highlight = { enable = true },
+  highlight = {
+    enable = true,
+    disable = { "html" } -- https://github.com/nvim-treesitter/nvim-treesitter/issues/1788
+  },
   incremental_selection = { enable = true },
   textobjects = { enable = true },
   indent = {
     enable = true,
-    disable = { "vue" }
+    disable = { "java" }
   },
   playground = {
     enable = true,
@@ -546,6 +546,9 @@ require('telescope').setup{
         ["<esc>"] = actions.close,
       },
     },
+    scroll_strategy = "limit",
+    path_display = { "smart" },
+    dynamic_preview_title = true,
     vimgrep_arguments = {
       "rg",
       "--color=never",
@@ -596,11 +599,6 @@ set guicursor=n-v-c:block,i-ci-ve:ver25,r-cr:hor20,o:hor50,a:blinkwait700-blinko
 
 " prettier
 command! -nargs=0 Prettier :call CocAction('runCommand', 'prettier.formatFile')
-
-" re-highlight vue files from start when opening
-" https://github.com/posva/vim-vue#my-syntax-highlighting-stops-working-randomly
-autocmd FileType vue syntax sync fromstart
-
 
 if filereadable(glob("~/.nvimrc.local"))
   source ~/.nvimrc.local

@@ -1,16 +1,18 @@
 {
-  "coc.preferences.formatOnSaveFiletypes": ["javascript", "javascript.jsx", "typescript", "typescript.tsx", "vue"],
+  "coc.preferences.formatOnSaveFiletypes": ["javascript", "javascript.jsx", "typescript", "typescript.tsx", "vue", "dart"],
   "suggest.enablePreview": true,
   "diagnostic.virtualText": true,
   "diagnostic.virtualTextPrefix": " > ",
-  "git.addGBlameToBufferVar": true,
-  "prettier.printWidth": 120,
-  "solargraph.useBundler": true,
   "codeLens.enable": true,
-  "omnisharp.trace.server": "verbose",
+
+  "solargraph.useBundler": true,
+
+  "git.addGBlameToBufferVar": true,
+
   "markdownlint.config": {
     "line_length": false
   },
+
   "languageserver": {
     "terraform": {
       "command": "terraform-ls",
@@ -19,8 +21,16 @@
       "initializationOptions": {}
     }
   },
+
   "typescript.format.enabled": false,
   "javascript.format.enabled": false,
-  "tsserver.log": "verbose",
-  "java.format.settings.url": "/Users/fpbouchard/.config/coc/extensions/node_modules/redhat.java/eclipse-formatter.xml"
+  "typescript.referencesCodeLens.enable": false,
+
+  "volar.formatting.enable": false,
+  "prettier.disableLanguages": [],
+
+  "prettier.printWidth": 120,
+
+  "java.format.settings.url": "/Users/fpbouchard/.config/coc/extensions/node_modules/redhat.java/eclipse-formatter.xml",
+  "java.errors.incompleteClasspath.severity": "ignore"
 }
