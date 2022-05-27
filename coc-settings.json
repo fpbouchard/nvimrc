@@ -1,11 +1,29 @@
 {
-  "coc.preferences.formatOnSaveFiletypes": ["javascript", "javascript.jsx", "typescript", "typescript.tsx", "vue", "dart"],
-  "suggest.enablePreview": true,
-  "diagnostic.virtualText": true,
-  "diagnostic.virtualTextPrefix": " > ",
+  "coc.preferences.formatOnSaveFiletypes": ["javascript", "javascript.jsx", "typescript", "typescript.tsx", "typescriptreact", "vue", "dart", "prisma", "terraform", "tf", "graphql"],
   "codeLens.enable": true,
+  "suggest.enablePreview": true,
+  "suggest.floatConfig": {
+    "border": true
+  },
+  "diagnostic.virtualText": true,
+  "diagnostic.virtualTextPrefix": " ⇒ ",
+  "diagnostic.virtualTextLineSeparator": " \\ ",
+  "diagnostic.virtualTextCurrentLineOnly": false,
+  "diagnostic.errorSign": "✘",
+  "diagnostic.warningSign": "⚠",
+  "diagnostic.infoSign": "",
+  "diagnostic.hintSign": "",
+  "diagnostic.floatConfig": {
+    "border": true
+  },
+  "signature.floatConfig": {
+    "border": true
+  },
+  "hover.floatConfig": {
+    "border": true
+  },
 
-  "solargraph.useBundler": true,
+  "solargraph.commandPath": "/Users/fp/.rbenv/shims/solargraph",
 
   "git.addGBlameToBufferVar": true,
 
@@ -17,20 +35,30 @@
     "terraform": {
       "command": "terraform-ls",
       "args": ["serve"],
-      "filetypes": ["terraform", "tf"],
-      "initializationOptions": {}
+      "filetypes": ["terraform"],
+      "initializationOptions": {},
+      "settings": {}
     }
   },
 
   "typescript.format.enabled": false,
   "javascript.format.enabled": false,
   "typescript.referencesCodeLens.enable": false,
+  "typescript.implementationsCodeLens.enable": false,
+  "javascript.referencesCodeLens.enable": false,
+  "javascript.implementationsCodeLens.enable": false,
 
-  "volar.formatting.enable": false,
-  "prettier.disableLanguages": [],
+  "java.format.settings.url": "/Users/fp/.config/coc/extensions/node_modules/redhat.java/eclipse-formatter.xml",
+  "java.errors.incompleteClasspath.severity": "ignore",
 
-  "prettier.printWidth": 120,
+  "json.schemas": [{
+    "fileMatch": [
+      "firebase.json"
+    ],
+    "url": "https://raw.githubusercontent.com/firebase/firebase-tools/master/schema/firebase-config.json"
+  }],
 
-  "java.format.settings.url": "/Users/fpbouchard/.config/coc/extensions/node_modules/redhat.java/eclipse-formatter.xml",
-  "java.errors.incompleteClasspath.severity": "ignore"
+  "flutter.autoOpenDevLog": true,
+  "flutter.closingLabelPrefix": "<- ",
+  "dart.lineLength": 120
 }

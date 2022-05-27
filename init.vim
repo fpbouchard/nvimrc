@@ -6,9 +6,9 @@
 
 " Autoinstall vim-plug
 " {{{
-if empty(glob('~/.vim/autoload/plug.vim'))
-  silent !curl -fLo ~/.vim/autoload/plug.vim --create-dirs
-    \ https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
+let data_dir = has('nvim') ? stdpath('data') . '/site' : '~/.vim'
+if empty(glob(data_dir . '/autoload/plug.vim'))
+  silent execute '!curl -fLo '.data_dir.'/autoload/plug.vim --create-dirs  https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim'
   autocmd VimEnter * PlugInstall --sync | source $MYVIMRC
 endif
 " }}}
@@ -27,13 +27,32 @@ Plug 'nvim-lua/plenary.nvim'
 Plug 'nvim-telescope/telescope-fzf-native.nvim', { 'do': 'make' }
 Plug 'nvim-telescope/telescope.nvim'
 
+Plug 'windwp/nvim-spectre'
+" {{{
+nnoremap <leader>S <cmd>lua require('spectre').open()<CR>
+
+"search current word
+nnoremap <leader>sw <cmd>lua require('spectre').open_visual({select_word=true})<CR>
+vnoremap <leader>s <cmd>lua require('spectre').open_visual()<CR>
+"  search in current file
+nnoremap <leader>sp viw:lua require('spectre').open_file_search()<cr>
+" run command :Spectre
+" }}}
+
+
 " Find files using Telescope command-line sugar.
 nnoremap <leader><leader> <cmd>lua require('telescope.builtin').find_files()<cr>
 nnoremap <leader>rs <cmd>lua require('telescope.builtin').grep_string()<cr>
 nnoremap <leader>rg <cmd>lua require('telescope.builtin').live_grep()<cr>
 nnoremap <leader>b <cmd>lua require('telescope.builtin').buffers()<cr>
+nnoremap <leader>B <cmd>lua require('telescope.builtin').oldfiles()<cr>
 nnoremap <leader>h <cmd>lua require('telescope.builtin').help_tags()<cr>
 nnoremap <leader>o <cmd>lua require('telescope.builtin').treesitter()<cr>
+
+nnoremap <leader>gc <cmd>lua require('telescope.builtin').git_commits()<cr>
+nnoremap <leader>gh <cmd>lua require('telescope.builtin').git_bcommits()<cr>
+nnoremap <leader>gb <cmd>lua require('telescope.builtin').git_branches()<cr>
+nnoremap <leader>gs <cmd>lua require('telescope.builtin').git_status()<cr>
 
 " AUTOCOMPLETE/LINT
 " ==============================================================
@@ -99,19 +118,17 @@ else
 endif
 
 let g:coc_global_extensions = [
-      \'@yaegassy/coc-volar',
-      \'coc-actions',
       \'coc-css',
+      \'coc-eslint',
       \'coc-flutter',
       \'coc-git',
       \'coc-html',
       \'coc-java',
       \'coc-json',
       \'coc-markdownlint',
-      \'coc-marketplace',
-      \'coc-omnisharp',
       \'coc-pairs',
       \'coc-prettier',
+      \'coc-prisma',
       \'coc-solargraph',
       \'coc-tsserver',
       \'coc-webpack',
@@ -204,14 +221,12 @@ xmap ac <Plug>(coc-classobj-a)
 omap ac <Plug>(coc-classobj-a)
 
 " Remap <C-f> and <C-b> for scroll float windows/popups.
-if has('nvim-0.4.0') || has('patch-8.2.0750')
-  nnoremap <silent><nowait><expr> <C-f> coc#float#has_scroll() ? coc#float#scroll(1) : "\<C-f>"
-  nnoremap <silent><nowait><expr> <C-b> coc#float#has_scroll() ? coc#float#scroll(0) : "\<C-b>"
-  inoremap <silent><nowait><expr> <C-f> coc#float#has_scroll() ? "\<c-r>=coc#float#scroll(1)\<cr>" : "\<Right>"
-  inoremap <silent><nowait><expr> <C-b> coc#float#has_scroll() ? "\<c-r>=coc#float#scroll(0)\<cr>" : "\<Left>"
-  vnoremap <silent><nowait><expr> <C-f> coc#float#has_scroll() ? coc#float#scroll(1) : "\<C-f>"
-  vnoremap <silent><nowait><expr> <C-b> coc#float#has_scroll() ? coc#float#scroll(0) : "\<C-b>"
-endif
+nnoremap <silent><nowait><expr> <C-f> coc#float#has_scroll() ? coc#float#scroll(1) : "\<C-f>"
+nnoremap <silent><nowait><expr> <C-b> coc#float#has_scroll() ? coc#float#scroll(0) : "\<C-b>"
+inoremap <silent><nowait><expr> <C-f> coc#float#has_scroll() ? "\<c-r>=coc#float#scroll(1)\<cr>" : "\<Right>"
+inoremap <silent><nowait><expr> <C-b> coc#float#has_scroll() ? "\<c-r>=coc#float#scroll(0)\<cr>" : "\<Left>"
+vnoremap <silent><nowait><expr> <C-f> coc#float#has_scroll() ? coc#float#scroll(1) : "\<C-f>"
+vnoremap <silent><nowait><expr> <C-b> coc#float#has_scroll() ? coc#float#scroll(0) : "\<C-b>"
 
 " Use CTRL-S for selections ranges.
 " Requires 'textDocument/selectionRange' support of LS, ex: coc-tsserver
@@ -252,13 +267,34 @@ nnoremap <silent> <space>p  :<C-u>CocListResume<CR>
 
 " }}}
 
+Plug 'github/copilot.vim'
+let g:copilot_enabled = 0
+nnoremap <silent> <leader>cc :Copilot<CR>
+nnoremap <silent> <leader>ca :Copilot enable<CR>
+nnoremap <silent> <leader>cd :Copilot disable<CR>
+
 " LANGUAGES
 " ==============================================================
 
 
 Plug 'nvim-treesitter/nvim-treesitter', { 'do': ':TSUpdate' }
-Plug 'nvim-treesitter/playground'
+" Plug 'nvim-treesitter/playground'
 " Plug 'sheerun/vim-polyglot'
+
+" Temporary fix for prisma files not formatting on save
+" https://github.com/pantharshit00/coc-prisma/issues/22
+augroup prisma
+  autocmd!
+  autocmd FileType prisma autocmd BufWritePre <buffer> call CocActionAsync('format')
+augroup END
+
+" Temporary fix so all terraform files are set as terraform filetype (fixes
+" terraform-ls)
+augroup terraform_filetype
+    au!
+    autocmd BufNewFile,BufRead *tf   set filetype=terraform
+augroup END
+
 
 " EDITING
 " ==============================================================
@@ -290,6 +326,7 @@ Plug 'vim-test/vim-test'
 
   let test#strategy = "kitty"
   let test#java#runner = 'gradletest'
+  let test#javascript#runner = 'jest'
 " }}}
 
 
@@ -298,18 +335,13 @@ Plug 'vim-test/vim-test'
 
 Plug 'tpope/vim-git'
 Plug 'tpope/vim-fugitive'
-" {{{
-  nnoremap <silent> <Leader>gb :Git blame<CR>
-  nnoremap <silent> <Leader>gf :Git diff<CR>
-" }}}
-Plug 'tpope/vim-bundler'
 Plug 'kshenoy/vim-signature'
 
 Plug 'itchyny/lightline.vim'
 " {{{
 
   let g:lightline = {
-    \ 'colorscheme': 'nord',
+    \ 'colorscheme': 'everforest',
     \ 'active': {
     \   'left': [ [ 'mode', 'paste' ],
     \             [ 'gitbranch', 'readonly', 'relativepath', 'modified' ] ],
@@ -328,7 +360,7 @@ Plug 'itchyny/lightline.vim'
     \ 'subseparator': { 'left': '', 'right': '' }
     \ }
   let g:lightline.component_function = {
-    \ 'gitbranch' : 'fugitive#head',
+    \ 'gitbranch' : 'FugitiveHead',
     \ 'gitstatus' : 'g:coc_git_status',
     \ 'blame'     : 'LightlineGitBlame'
     \ }
@@ -388,32 +420,10 @@ Plug 'itchyny/lightline.vim'
 
   set noshowmode " Remove duplicate information
 " }}}
-Plug 'mengelbrecht/lightline-bufferline'
-" {{{
-  let g:lightline#bufferline#enable_devicons = 1
-  let g:lightline#bufferline#show_number = 2
 
-  nmap <Leader>1 <Plug>lightline#bufferline#go(1)
-  nmap <Leader>2 <Plug>lightline#bufferline#go(2)
-  nmap <Leader>3 <Plug>lightline#bufferline#go(3)
-  nmap <Leader>4 <Plug>lightline#bufferline#go(4)
-  nmap <Leader>5 <Plug>lightline#bufferline#go(5)
-  nmap <Leader>6 <Plug>lightline#bufferline#go(6)
-  nmap <Leader>7 <Plug>lightline#bufferline#go(7)
-  nmap <Leader>8 <Plug>lightline#bufferline#go(8)
-  nmap <Leader>9 <Plug>lightline#bufferline#go(9)
-  nmap <Leader>0 <Plug>lightline#bufferline#go(10)
-" }}}
-
-Plug 'ludovicchabant/vim-gutentags'
-" {{{
-  let g:gutentags_file_list_command = 'rg --files'
-" }}}
-
-Plug 'kyazdani42/nvim-web-devicons' " If you want devicons
-Plug 'christianchiarulli/nvcode-color-schemes.vim'
+" Plug 'christianchiarulli/nvcode-color-schemes.vim'
 " Plug 'arcticicestudio/nord-vim'
-
+Plug 'sainnhe/everforest'
 
 call plug#end()
 
@@ -436,16 +446,18 @@ set nowritebackup
 set noswapfile
 set nowrap                        " Turn off line wrapping.
 set scrolloff=3                   " Show 3 lines of context around the cursor.
-
 set laststatus=2
 set number          " show line numbers
+set mouse=a
 
 set autoread
 " This makes sure that autoread gets triggered when nvim gets the focus
+" Sadly, only works in GUI vim
 au FocusGained * silent! checktime
+" This will do the same after cursor inactivity
+au CursorHold * checktime
 
 set timeoutlen=500 " shorten the delay to wait when a mapped sequence is started
-
 set updatetime=300 " default is 4000; time before CursorHold and various 'inactive' things trigger
 
 " Split below and right
@@ -455,8 +467,6 @@ set splitright
 " Show tabs, trailing whitespaces, extends and precedes
 set list
 set listchars=tab:>-,trail:·,extends:>,precedes:<,nbsp:+
-
-set showtabline=2
 
 " INDENTATION
 " ==============================================================
@@ -483,28 +493,26 @@ set foldlevel=99
 
 " COLORSCHEME
 " ==============================================================
+
 set termguicolors
+set background=dark
 
-colorscheme nord
+let g:everforest_background = 'hard'
+let g:everforst_enable_italic = 1
 
-"let g:gruvbox_italic=1
-"colorscheme gruvbox
-
-"colorscheme solarized
-"set background=dark
-"call togglebg#map("<F4>")
-
+colorscheme everforest
 
 " MISC
 " ==============================================================
 set cursorline
-set colorcolumn=200
+set colorcolumn=120
 
 " Initialize LUA plugins
 lua <<EOF
 -- Tree Sitter
 require'nvim-treesitter.configs'.setup {
-  ensure_installed = "maintained", -- one of "all", "maintained" (parsers with maintainers), or a list of languages
+  ensure_installed = "all", -- one of "all", "maintained" (parsers with maintainers), or a list of languages
+  ignore_install = { "phpdoc" }, -- fails installation
   highlight = {
     enable = true,
     disable = { "html" } -- https://github.com/nvim-treesitter/nvim-treesitter/issues/1788
@@ -565,16 +573,23 @@ require('telescope').setup{
       hidden = true
     },
     buffers = {
-      sort_lastused = true
+      ignore_current_buffer = true,
+      sort_mru = true,
+      mappings = {
+        i = {
+          ["<c-d>"] = actions.delete_buffer,
+        }
+      }
     }
   }
 }
 require('telescope').load_extension('fzf')
+
+require('spectre').setup{
+  live_update = true,
+}
 EOF
 
-
-" CTags - refresh tags (replaced by gutentags)
-"map <Leader>c :!ctags --extra=+f --exclude=.git --exclude=log --exclude=compiled --exclude=tmp -R *<CR><CR>
 
 " Clear the current search highlight by pressing Esc
 nnoremap <silent> <esc><esc> :noh<CR><esc>
