@@ -22,6 +22,9 @@ Plug 'justinmk/vim-dirvish'
 Plug 'kristijanhusak/vim-dirvish-git'
 Plug 'roginfarrer/vim-dirvish-dovish', {'branch': 'main'}
 
+Plug 'junegunn/fzf', { 'do': { -> fzf#install() } }
+Plug 'kevinhwang91/nvim-bqf'
+
 Plug 'nvim-lua/popup.nvim'
 Plug 'nvim-lua/plenary.nvim'
 Plug 'nvim-telescope/telescope-fzf-native.nvim', { 'do': 'make' }
@@ -83,13 +86,38 @@ let g:ale_fixers = {
 \   'terraform': ['terraform']
 \}
 
-nmap <silent> <C-k> <Plug>(ale_previous_wrap)
-nmap <silent> <C-j> <Plug>(ale_next_wrap)
+" nmap <silent> <C-k> <Plug>(ale_previous_wrap)
+" nmap <silent> <C-j> <Plug>(ale_next_wrap)
 " }}}
 
 
 Plug 'neoclide/coc.nvim', {'branch': 'release'}
 " {{{
+
+" Custom settings
+inoremap <silent> <c-K> <C-r>=CocActionAsync('showSignatureHelp')<CR>
+
+" Plugins
+let g:coc_global_extensions = [
+      \'coc-css',
+      \'coc-eslint',
+      \'coc-flutter',
+      \'coc-git',
+      \'coc-html',
+      \'coc-java',
+      \'coc-json',
+      \'coc-markdownlint',
+      \'coc-pairs',
+      \'coc-prettier',
+      \'coc-prisma',
+      \'coc-solargraph',
+      \'coc-sourcekit',
+      \'coc-tsserver',
+      \'coc-webpack',
+      \'coc-yaml'
+      \]
+
+" Below is pasted from coc.nvim's homepage
 
 " TextEdit might fail if hidden is not set.
 set hidden
@@ -117,34 +145,21 @@ else
   set signcolumn=yes
 endif
 
-let g:coc_global_extensions = [
-      \'coc-css',
-      \'coc-eslint',
-      \'coc-flutter',
-      \'coc-git',
-      \'coc-html',
-      \'coc-java',
-      \'coc-json',
-      \'coc-markdownlint',
-      \'coc-pairs',
-      \'coc-prettier',
-      \'coc-prisma',
-      \'coc-solargraph',
-      \'coc-tsserver',
-      \'coc-webpack',
-      \'coc-yaml'
-      \]
-
 " Use tab for trigger completion with characters ahead and navigate.
 " NOTE: Use command ':verbose imap <tab>' to make sure tab is not mapped by
 " other plugin before putting this into your config.
 inoremap <silent><expr> <TAB>
-      \ pumvisible() ? "\<C-n>" :
-      \ <SID>check_back_space() ? "\<TAB>" :
+      \ coc#pum#visible() ? coc#pum#next(1):
+      \ CheckBackspace() ? "\<Tab>" :
       \ coc#refresh()
-inoremap <expr><S-TAB> pumvisible() ? "\<C-p>" : "\<C-h>"
+inoremap <expr><S-TAB> coc#pum#visible() ? coc#pum#prev(1) : "\<C-h>"
 
-function! s:check_back_space() abort
+" Make <CR> to accept selected completion item or notify coc.nvim to format
+" <C-g>u breaks current undo, please make your own choice.
+inoremap <silent><expr> <CR> coc#pum#visible() ? coc#pum#confirm()
+                              \: "\<C-g>u\<CR>\<c-r>=coc#on_enter()\<CR>"
+
+function! CheckBackspace() abort
   let col = col('.') - 1
   return !col || getline('.')[col - 1]  =~# '\s'
 endfunction
@@ -155,11 +170,6 @@ if has('nvim')
 else
   inoremap <silent><expr> <c-@> coc#refresh()
 endif
-
-" Make <CR> auto-select the first completion item and notify coc.nvim to
-" format on enter, <cr> could be remapped by other vim plugin
-inoremap <silent><expr> <cr> pumvisible() ? coc#_select_confirm()
-                              \: "\<C-g>u\<CR>\<c-r>=coc#on_enter()\<CR>"
 
 " Use `[g` and `]g` to navigate diagnostics
 nmap <silent> [g <Plug>(coc-diagnostic-prev)
@@ -172,17 +182,18 @@ nmap <silent> gi <Plug>(coc-implementation)
 nmap <silent> gr <Plug>(coc-references)
 
 " Use K to show documentation in preview window.
-nnoremap <silent> K :call <SID>show_documentation()<CR>
+nnoremap <silent> K :call ShowDocumentation()<CR>
 
-function! s:show_documentation()
-  if (index(['vim','help'], &filetype) >= 0)
-    execute 'h '.expand('<cword>')
-  elseif (coc#rpc#ready())
+function! ShowDocumentation()
+  if CocAction('hasProvider', 'hover')
     call CocActionAsync('doHover')
   else
-    execute '!' . &keywordprg . " " . expand('<cword>')
+    call feedkeys('K', 'in')
   endif
 endfunction
+
+" Highlight the symbol and its references when holding the cursor.
+autocmd CursorHold * silent call CocActionAsync('highlight')
 
 " Symbol renaming.
 nmap <leader>rn <Plug>(coc-rename)
@@ -267,26 +278,14 @@ nnoremap <silent> <space>p  :<C-u>CocListResume<CR>
 
 " }}}
 
-Plug 'github/copilot.vim'
-let g:copilot_enabled = 0
-nnoremap <silent> <leader>cc :Copilot<CR>
-nnoremap <silent> <leader>ca :Copilot enable<CR>
-nnoremap <silent> <leader>cd :Copilot disable<CR>
-
 " LANGUAGES
 " ==============================================================
-
 
 Plug 'nvim-treesitter/nvim-treesitter', { 'do': ':TSUpdate' }
 " Plug 'nvim-treesitter/playground'
 " Plug 'sheerun/vim-polyglot'
-
-" Temporary fix for prisma files not formatting on save
-" https://github.com/pantharshit00/coc-prisma/issues/22
-augroup prisma
-  autocmd!
-  autocmd FileType prisma autocmd BufWritePre <buffer> call CocActionAsync('format')
-augroup END
+" Plug 'dart-lang/dart-vim-plugin' " https://github.com/nvim-treesitter/nvim-treesitter/issues/2961
+Plug 'delphinus/vim-firestore'
 
 " Temporary fix so all terraform files are set as terraform filetype (fixes
 " terraform-ls)
@@ -512,7 +511,7 @@ lua <<EOF
 -- Tree Sitter
 require'nvim-treesitter.configs'.setup {
   ensure_installed = "all", -- one of "all", "maintained" (parsers with maintainers), or a list of languages
-  ignore_install = { "phpdoc" }, -- fails installation
+  ignore_install = { "phpdoc" }, -- phodoc fails installation, dart seg faults https://github.com/nvim-treesitter/nvim-treesitter/issues/2961
   highlight = {
     enable = true,
     disable = { "html" } -- https://github.com/nvim-treesitter/nvim-treesitter/issues/1788
@@ -524,7 +523,7 @@ require'nvim-treesitter.configs'.setup {
     disable = { "java" }
   },
   playground = {
-    enable = true,
+    enable = false,
     disable = {},
     updatetime = 25, -- Debounced time for highlighting nodes in the playground from source code
     persist_queries = false, -- Whether the query persists across vim sessions
@@ -605,6 +604,12 @@ function! SetCursorPosition()
     endif
   end
 endfunction
+
+" In visual mode, shift-J / shift-k moves and indents the selection
+lua <<EOF
+vim.keymap.set("v", "J", ":m '>+1<CR>gv=gv")
+vim.keymap.set("v", "K", ":m '<-2<CR>gv=gv")
+EOF
 
 
 " NVIM

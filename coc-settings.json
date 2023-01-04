@@ -1,7 +1,21 @@
 {
-  "coc.preferences.formatOnSaveFiletypes": ["javascript", "javascript.jsx", "typescript", "typescript.tsx", "typescriptreact", "vue", "dart", "prisma", "terraform", "tf", "graphql"],
-  "codeLens.enable": true,
-  "suggest.enablePreview": true,
+  "coc.preferences.formatOnSaveFiletypes": [
+    "javascript",
+    "javascript.jsx",
+    "javascriptreact",
+    "json",
+    "typescript",
+    "typescript.tsx",
+    "typescriptreact",
+    "vue",
+    "dart",
+    "terraform",
+    "tf",
+    "graphql",
+    "prisma",
+    "css"
+  ],
+  "codeLens.enable": false,
   "suggest.floatConfig": {
     "border": true
   },
@@ -22,15 +36,11 @@
   "hover.floatConfig": {
     "border": true
   },
-
   "solargraph.commandPath": "/Users/fp/.rbenv/shims/solargraph",
-
   "git.addGBlameToBufferVar": true,
-
   "markdownlint.config": {
     "line_length": false
   },
-
   "languageserver": {
     "terraform": {
       "command": "terraform-ls",
@@ -40,24 +50,14 @@
       "settings": {}
     }
   },
-
-  "typescript.format.enabled": false,
-  "javascript.format.enabled": false,
-  "typescript.referencesCodeLens.enable": false,
-  "typescript.implementationsCodeLens.enable": false,
-  "javascript.referencesCodeLens.enable": false,
-  "javascript.implementationsCodeLens.enable": false,
-
   "java.format.settings.url": "/Users/fp/.config/coc/extensions/node_modules/redhat.java/eclipse-formatter.xml",
   "java.errors.incompleteClasspath.severity": "ignore",
-
-  "json.schemas": [{
-    "fileMatch": [
-      "firebase.json"
-    ],
-    "url": "https://raw.githubusercontent.com/firebase/firebase-tools/master/schema/firebase-config.json"
-  }],
-
+  "json.schemas": [
+    {
+      "fileMatch": ["firebase.json"],
+      "url": "https://raw.githubusercontent.com/firebase/firebase-tools/master/schema/firebase-config.json"
+    }
+  ],
   "flutter.autoOpenDevLog": true,
   "flutter.closingLabelPrefix": "<- ",
   "dart.lineLength": 120
