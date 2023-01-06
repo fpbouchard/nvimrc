@@ -67,20 +67,25 @@ require('packer').startup(function(use)
   end
 
   -- FP: My custom plugins are here
-	use 'justinmk/vim-dirvish'
-	use 'kristijanhusak/vim-dirvish-git'
-	use { 'roginfarrer/vim-dirvish-dovish', branch = 'main' }
+  use 'justinmk/vim-dirvish'
+  use 'kristijanhusak/vim-dirvish-git'
+  use { 'roginfarrer/vim-dirvish-dovish', branch = 'main' }
 
-  use { 'windwp/nvim-spectre', requires = { 'nvim-lua/plenary.nvim' }}
+  use 'farmergreg/vim-lastplace'
 
-  use {'tpope/vim-surround', requires = { 'tpope/vim-repeat' }}
+  use { 'windwp/nvim-spectre', requires = { 'nvim-lua/plenary.nvim' } }
+
+  use { 'tpope/vim-surround', requires = { 'tpope/vim-repeat' } }
   use 'windwp/nvim-autopairs'
 
   use 'kshenoy/vim-signature'
 
   use 'mfussenegger/nvim-dap'
+  use { "rcarriga/nvim-dap-ui", requires = { "mfussenegger/nvim-dap" } }
+  use { 'nvim-telescope/telescope-dap.nvim',
+    requires = { 'mfussenegger/nvim-dap', 'nvim-telescope/telescope.nvim', 'nvim-treesitter' } }
 
-  use {'akinsho/flutter-tools.nvim', requires = 'nvim-lua/plenary.nvim'}
+  use { 'akinsho/flutter-tools.nvim', requires = 'nvim-lua/plenary.nvim' }
 
   if is_bootstrap then
     require('packer').sync()
@@ -149,6 +154,10 @@ vim.o.completeopt = 'menuone,noselect'
 vim.o.clipboard = 'unnamed,unnamedplus'
 vim.o.colorcolumn = '80,120'
 vim.o.cursorline = true
+vim.o.foldexpr = 'nvim_treesitter#foldexpr()'
+vim.o.foldlevel = 99
+vim.o.foldmethod = 'expr'
+vim.o.guicursor = 'n-v-c:block,i-ci-ve:ver25,r-cr:hor20,o:hor50,a:blinkwait700-blinkoff400-blinkon250-Cursor/lCursor,sm:block-blinkwait175-blinkoff150-blinkon175'
 vim.o.list = true
 vim.o.listchars = 'tab:>-,trail:·,extends:>,precedes:<,nbsp:+'
 vim.o.scrolloff = 3
@@ -157,10 +166,9 @@ vim.o.title = true
 vim.o.undolevels = 5000
 vim.o.visualbell = true
 vim.o.wrap = false
-vim.o.guicursor = 'n-v-c:block,i-ci-ve:ver25,r-cr:hor20,o:hor50,a:blinkwait700-blinkoff400-blinkon250-Cursor/lCursor,sm:block-blinkwait175-blinkoff150-blinkon175'
 
 vim.o.autoread = true
-vim.api.nvim_create_autocmd({'FocusGained', 'CursorHold'}, {
+vim.api.nvim_create_autocmd({ 'FocusGained', 'CursorHold' }, {
   command = 'silent! checktime',
   pattern = '*'
 })
@@ -173,11 +181,6 @@ vim.o.shiftwidth = 2
 vim.o.shiftround = true
 
 -- [[ Basic Keymaps ]]
--- Set \ as the leader key
--- See `:help mapleader`
---  NOTE: Must happen before plugins are required (otherwise wrong leader will be used)
-vim.g.mapleader = '\\'
-vim.g.maplocalleader = '\\'
 
 -- Keymaps for better default experience
 -- See `:help vim.keymap.set()`
@@ -291,6 +294,8 @@ vim.keymap.set('n', '<leader>sh', require('telescope.builtin').help_tags, { desc
 vim.keymap.set('n', '<leader>sw', require('telescope.builtin').grep_string, { desc = '[S]earch current [W]ord' })
 vim.keymap.set('n', '<leader>sg', require('telescope.builtin').live_grep, { desc = '[S]earch by [G]rep' })
 vim.keymap.set('n', '<leader>sd', require('telescope.builtin').diagnostics, { desc = '[S]earch [D]iagnostics' })
+vim.keymap.set('n', '<leader>sf', require('telescope').extensions.flutter.commands, { desc = '[S]earch [F]lutter' })
+vim.keymap.set('n', '<leader>sp', require('telescope').extensions.dap.commands, { desc = '[S]earch DA[P] (Debugger)' })
 
 -- [[ Configure Treesitter ]]
 -- See `:help nvim-treesitter`
@@ -378,8 +383,17 @@ local on_attach = function(_, bufnr)
     vim.keymap.set('n', keys, func, { buffer = bufnr, desc = desc })
   end
 
+  local xmap = function(keys, func, desc)
+    if desc then
+      desc = 'LSP: ' .. desc
+    end
+
+    vim.keymap.set('x', keys, func, { buffer = bufnr, desc = desc })
+  end
+
   nmap('<leader>rn', vim.lsp.buf.rename, '[R]e[n]ame')
   nmap('<leader>ca', vim.lsp.buf.code_action, '[C]ode [A]ction')
+  xmap('<leader>ca', vim.lsp.buf.code_action, '[C]ode [A]ction')
 
   nmap('gd', vim.lsp.buf.definition, '[G]oto [D]efinition')
   nmap('gr', require('telescope.builtin').lsp_references, '[G]oto [R]eferences')
@@ -404,6 +418,12 @@ local on_attach = function(_, bufnr)
   vim.api.nvim_buf_create_user_command(bufnr, 'Format', function(_)
     vim.lsp.buf.format()
   end, { desc = 'Format current buffer with LSP' })
+
+  vim.api.nvim_create_autocmd('BufWritePre', {
+    command = 'lua vim.lsp.buf.formatting_sync()',
+    buffer = bufnr,
+  })
+
 end
 
 -- Enable the following language servers
@@ -500,14 +520,31 @@ cmp.setup {
 }
 
 -- FP: Other plugins and keymaps
-require('spectre').setup{
+require('spectre').setup {
   live_update = true,
 }
 vim.keymap.set('n', '<leader>S', '<cmd>lua require("spectre").open()<CR>')
-vim.keymap.set('n', '<leader>sw', '<cmd>lua require("spectre").open_visual({select_word=true})<CR>')
-vim.keymap.set('v', '<leader>s', '<cmd>lua require("spectre").open_visual()<CR>')
+vim.keymap.set('n', '<leader>rw', '<cmd>lua require("spectre").open_visual({select_word=true})<CR>')
+vim.keymap.set('x', '<leader>r', '<cmd>lua require("spectre").open_visual()<CR>')
 
-require("flutter-tools").setup {} -- use defaults
+require("flutter-tools").setup {
+  lsp = {
+    on_attach = on_attach,
+    capabilities = capabilities,
+    settings = {
+      lineLength = 120,
+    }
+  },
+  debugger = {
+    enabled = true,
+    run_via_dap = true
+  },
+  widget_guides = {
+    enabled = true
+  }
+}
+require('telescope').load_extension('flutter')
+
 
 require('nvim-autopairs').setup {}
 local cmp_autopairs = require('nvim-autopairs.completion.cmp')
@@ -516,10 +553,119 @@ cmp.event:on(
   cmp_autopairs.on_confirm_done()
 )
 
+-- Add spaces between parentheses
+-- https://github.com/windwp/nvim-autopairs/wiki/Custom-rules#add-spaces-between-parentheses
+local npairs   = require 'nvim-autopairs'
+local Rule     = require 'nvim-autopairs.rule'
+local brackets = { { '(', ')' }, { '[', ']' }, { '{', '}' } }
+npairs.add_rules {
+  Rule(' ', ' ')
+      :with_pair(function(opts)
+        local pair = opts.line:sub(opts.col - 1, opts.col)
+        return vim.tbl_contains({
+          brackets[1][1] .. brackets[1][2],
+          brackets[2][1] .. brackets[2][2],
+          brackets[3][1] .. brackets[3][2],
+        }, pair)
+      end)
+}
+for _, bracket in pairs(brackets) do
+  npairs.add_rules {
+    Rule(bracket[1] .. ' ', ' ' .. bracket[2])
+        :with_pair(function() return false end)
+        :with_move(function(opts)
+          return opts.prev_char:match('.%' .. bracket[2]) ~= nil
+        end)
+        :use_key(bracket[2])
+  }
+end
+
+-- Expand multiple pairs on enter keys
+-- https://github.com/windwp/nvim-autopairs/wiki/Custom-rules#expand-multiple-pairs-on-enter-key
+-- https://github.com/rstacruz/vim-closer/blob/master/autoload/closer.vim
+local get_closing_for_line = function(line)
+  local i = -1
+  local clo = ''
+
+  while true do
+    i, _ = string.find(line, "[%(%)%{%}%[%]]", i + 1)
+    if i == nil then break end
+    local ch = string.sub(line, i, i)
+    local st = string.sub(clo, 1, 1)
+
+    if ch == '{' then
+      clo = '}' .. clo
+    elseif ch == '}' then
+      if st ~= '}' then return '' end
+      clo = string.sub(clo, 2)
+    elseif ch == '(' then
+      clo = ')' .. clo
+    elseif ch == ')' then
+      if st ~= ')' then return '' end
+      clo = string.sub(clo, 2)
+    elseif ch == '[' then
+      clo = ']' .. clo
+    elseif ch == ']' then
+      if st ~= ']' then return '' end
+      clo = string.sub(clo, 2)
+    end
+  end
+
+  return clo
+end
+
+npairs.remove_rule('(')
+npairs.remove_rule('{')
+npairs.remove_rule('[')
+
+npairs.add_rule(
+  Rule("[%(%{%[]", "")
+  :use_regex(true)
+  :replace_endpair(function(opts)
+    return get_closing_for_line(opts.line)
+  end)
+  :end_wise()
+)
+
+-- < nvim-autopairs
+
+require('telescope').load_extension('dap')
+
+local dap, dapui = require("dap"), require("dapui")
+dapui.setup {}
+vim.keymap.set('n', '<leader>dp', '<cmd>lua require("dapui").toggle()<CR>')
+
+local api = vim.api
+local keymap_restore = {}
+dap.listeners.after['event_initialized']['me'] = function()
+  for _, buf in pairs(api.nvim_list_bufs()) do
+    local keymaps = api.nvim_buf_get_keymap(buf, 'n')
+    for _, keymap in pairs(keymaps) do
+      if keymap.lhs == "K" then
+        table.insert(keymap_restore, keymap)
+        api.nvim_buf_del_keymap(buf, 'n', 'K')
+      end
+    end
+  end
+  api.nvim_set_keymap(
+    'n', 'K', '<Cmd>lua require("dap.ui.widgets").hover()<CR>', { silent = true })
+end
+
+dap.listeners.after['event_terminated']['me'] = function()
+  for _, keymap in pairs(keymap_restore) do
+    vim.keymap.set('n', 'K', vim.lsp.buf.hover, { buffer = keymap.buffer, desc = '[LSP] Hover Documentation' })
+  end
+  keymap_restore = {}
+end
+
 -- In visual mode, shift-J / shift-k moves and indents the selection
 vim.keymap.set("v", "J", ":m '>+1<CR>gv=gv")
 vim.keymap.set("v", "K", ":m '<-2<CR>gv=gv")
 
+-- Paste over selection and bypass black hole register
+vim.keymap.set("x", "<leader>p", [["_dP]])
+-- Same with delete
+vim.keymap.set("n", "<leader>d", [["_d]])
 
 -- The line beneath this is called `modeline`. See `:help modeline`
 -- vim: ts=2 sts=2 sw=2 et
