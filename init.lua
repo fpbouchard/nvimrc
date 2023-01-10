@@ -49,7 +49,10 @@ require('packer').startup(function(use)
   use 'lewis6991/gitsigns.nvim'
 
   use 'sainnhe/everforest'
-  use 'nvim-lualine/lualine.nvim' -- Fancier statusline
+  use {
+    'nvim-lualine/lualine.nvim',
+    requires = { 'kyazdani42/nvim-web-devicons', opt = true }
+  }
   use 'lukas-reineke/indent-blankline.nvim' -- Add indentation guides even on blank lines
   use 'numToStr/Comment.nvim' -- "gc" to comment visual regions/lines
   use 'tpope/vim-sleuth' -- Detect tabstop and shiftwidth automatically
@@ -71,6 +74,8 @@ require('packer').startup(function(use)
   use 'kristijanhusak/vim-dirvish-git'
   use { 'roginfarrer/vim-dirvish-dovish', branch = 'main' }
 
+  use 'f-person/git-blame.nvim'
+
   use 'farmergreg/vim-lastplace'
 
   use { 'windwp/nvim-spectre', requires = { 'nvim-lua/plenary.nvim' } }
@@ -84,6 +89,8 @@ require('packer').startup(function(use)
   use { "rcarriga/nvim-dap-ui", requires = { "mfussenegger/nvim-dap" } }
   use { 'nvim-telescope/telescope-dap.nvim',
     requires = { 'mfussenegger/nvim-dap', 'nvim-telescope/telescope.nvim', 'nvim-treesitter' } }
+
+  use { 'nvim-telescope/telescope-ui-select.nvim' }
 
   use { 'akinsho/flutter-tools.nvim', requires = 'nvim-lua/plenary.nvim' }
 
@@ -203,13 +210,17 @@ vim.api.nvim_create_autocmd('TextYankPost', {
 
 -- Set lualine as statusline
 -- See `:help lualine.txt`
+vim.g.gitblame_display_virtual_text = 0 -- Disable virtual text
+local git_blame = require('gitblame')
 require('lualine').setup {
   options = {
-    icons_enabled = false,
     theme = 'auto',
-    component_separators = '|',
-    section_separators = '',
   },
+  sections = {
+    lualine_c = {
+      { git_blame.get_current_blame_text, cond = git_blame.is_blame_text_available }
+    }
+  }
 }
 
 -- Enable Comment.nvim
@@ -271,6 +282,11 @@ require('telescope').setup {
           ['<c-d>'] = actions.delete_buffer,
         }
       }
+    }
+  },
+  extensions = {
+    ["ui-select"] = {
+      require("telescope.themes").get_dropdown {}
     }
   }
 }
@@ -544,6 +560,8 @@ require("flutter-tools").setup {
   }
 }
 require('telescope').load_extension('flutter')
+
+require('telescope').load_extension('ui-select')
 
 
 require('nvim-autopairs').setup {}
