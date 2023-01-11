@@ -94,6 +94,8 @@ require('packer').startup(function(use)
 
   use { 'akinsho/flutter-tools.nvim', requires = 'nvim-lua/plenary.nvim' }
 
+  use { 'rafamadriz/friendly-snippets' }
+
   if is_bootstrap then
     require('packer').sync()
   end
@@ -158,16 +160,17 @@ vim.cmd [[colorscheme everforest]]
 vim.o.completeopt = 'menuone,noselect'
 
 -- FP: General settings
-vim.o.clipboard = 'unnamed,unnamedplus'
+vim.o.clipboard = 'unnamed,unnamedplus' -- connect to system clipboard
 vim.o.colorcolumn = '80,120'
 vim.o.cursorline = true
 vim.o.foldexpr = 'nvim_treesitter#foldexpr()'
-vim.o.foldlevel = 99
+vim.o.foldlevel = 99 -- do not fold by default
 vim.o.foldmethod = 'expr'
 vim.o.guicursor = 'n-v-c:block,i-ci-ve:ver25,r-cr:hor20,o:hor50,a:blinkwait700-blinkoff400-blinkon250-Cursor/lCursor,sm:block-blinkwait175-blinkoff150-blinkon175'
 vim.o.list = true
 vim.o.listchars = 'tab:>-,trail:·,extends:>,precedes:<,nbsp:+'
 vim.o.scrolloff = 3
+vim.o.swapfile = false
 vim.o.timeoutlen = 500
 vim.o.title = true
 vim.o.undolevels = 5000
@@ -218,6 +221,7 @@ require('lualine').setup {
   },
   sections = {
     lualine_c = {
+      { 'filename', path = 1, shorting_target = 40, },
       { git_blame.get_current_blame_text, cond = git_blame.is_blame_text_available }
     }
   }
@@ -436,7 +440,7 @@ local on_attach = function(_, bufnr)
   end, { desc = 'Format current buffer with LSP' })
 
   vim.api.nvim_create_autocmd('BufWritePre', {
-    command = 'lua vim.lsp.buf.formatting_sync()',
+    command = 'lua vim.lsp.buf.format()',
     buffer = bufnr,
   })
 
@@ -495,6 +499,14 @@ require('fidget').setup()
 -- nvim-cmp setup
 local cmp = require 'cmp'
 local luasnip = require 'luasnip'
+local from_vscode = require 'luasnip.loaders.from_vscode'
+
+from_vscode.lazy_load() -- load plugins
+from_vscode.load({ paths = { "./snippets" } }) -- load locally
+
+-- activate optional frameworks
+-- https://github.com/rafamadriz/friendly-snippets/tree/main/snippets/frameworks
+luasnip.filetype_extend("dart", { "flutter" })
 
 cmp.setup {
   snippet = {
@@ -505,7 +517,7 @@ cmp.setup {
   mapping = cmp.mapping.preset.insert {
     ['<C-d>'] = cmp.mapping.scroll_docs(-4),
     ['<C-f>'] = cmp.mapping.scroll_docs(4),
-    ['<C-Space>'] = cmp.mapping.complete(),
+    ['<C-Space>'] = cmp.mapping.complete({}),
     ['<CR>'] = cmp.mapping.confirm {
       behavior = cmp.ConfirmBehavior.Replace,
       select = true,
@@ -562,7 +574,6 @@ require("flutter-tools").setup {
 require('telescope').load_extension('flutter')
 
 require('telescope').load_extension('ui-select')
-
 
 require('nvim-autopairs').setup {}
 local cmp_autopairs = require('nvim-autopairs.completion.cmp')
