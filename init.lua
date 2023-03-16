@@ -11,6 +11,9 @@ require('packer').startup(function(use)
   -- Package manager
   use 'wbthomason/packer.nvim'
 
+  -- editorconfig support (remove when nvim 0.9 is released, is now builtin)
+  use 'gpanders/editorconfig.nvim';
+
   use { -- LSP Configuration & Plugins
     'neovim/nvim-lspconfig',
     requires = {
@@ -26,9 +29,11 @@ require('packer').startup(function(use)
     },
   }
 
+  use 'delphinus/vim-firestore'
+
   use { -- Autocompletion
     'hrsh7th/nvim-cmp',
-    requires = { 'hrsh7th/cmp-nvim-lsp', 'L3MON4D3/LuaSnip', 'saadparwaiz1/cmp_luasnip' },
+    requires = { 'hrsh7th/cmp-nvim-lsp', 'L3MON4D3/LuaSnip', 'saadparwaiz1/cmp_luasnip', 'hrsh7th/cmp-buffer' },
   }
 
   use { -- Highlight, edit, and navigate code
@@ -36,6 +41,11 @@ require('packer').startup(function(use)
     run = function()
       pcall(require('nvim-treesitter.install').update { with_sync = true })
     end,
+  }
+
+  use {
+    'nvim-treesitter/playground',
+    requires = { 'nvim-treesitter/nvim-treesitter' }
   }
 
   use { -- Additional text objects via treesitter
@@ -54,8 +64,8 @@ require('packer').startup(function(use)
     requires = { 'kyazdani42/nvim-web-devicons', opt = true }
   }
   use 'lukas-reineke/indent-blankline.nvim' -- Add indentation guides even on blank lines
-  use 'numToStr/Comment.nvim' -- "gc" to comment visual regions/lines
-  use 'tpope/vim-sleuth' -- Detect tabstop and shiftwidth automatically
+  use 'numToStr/Comment.nvim'               -- "gc" to comment visual regions/lines
+  use 'tpope/vim-sleuth'                    -- Detect tabstop and shiftwidth automatically
 
   -- Fuzzy Finder (files, lsp, etc)
   use { 'nvim-telescope/telescope.nvim', branch = '0.1.x', requires = { 'nvim-lua/plenary.nvim' } }
@@ -93,6 +103,8 @@ require('packer').startup(function(use)
   use { 'nvim-telescope/telescope-ui-select.nvim' }
 
   use { 'akinsho/flutter-tools.nvim', requires = 'nvim-lua/plenary.nvim' }
+
+  use 'mfussenegger/nvim-jdtls'
 
   use { 'rafamadriz/friendly-snippets' }
 
@@ -161,12 +173,13 @@ vim.o.completeopt = 'menuone,noselect'
 
 -- FP: General settings
 vim.o.clipboard = 'unnamed,unnamedplus' -- connect to system clipboard
-vim.o.colorcolumn = '80,120'
+vim.o.colorcolumn = '120'
 vim.o.cursorline = true
 vim.o.foldexpr = 'nvim_treesitter#foldexpr()'
 vim.o.foldlevel = 99 -- do not fold by default
 vim.o.foldmethod = 'expr'
-vim.o.guicursor = 'n-v-c:block,i-ci-ve:ver25,r-cr:hor20,o:hor50,a:blinkwait700-blinkoff400-blinkon250-Cursor/lCursor,sm:block-blinkwait175-blinkoff150-blinkon175'
+vim.o.guicursor =
+'n-v-c:block,i-ci-ve:ver25,r-cr:hor20,o:hor50,a:blinkwait700-blinkoff400-blinkon250-Cursor/lCursor,sm:block-blinkwait175-blinkoff150-blinkon175'
 vim.o.list = true
 vim.o.listchars = 'tab:>-,trail:·,extends:>,precedes:<,nbsp:+'
 vim.o.scrolloff = 3
@@ -221,7 +234,7 @@ require('lualine').setup {
   },
   sections = {
     lualine_c = {
-      { 'filename', path = 1, shorting_target = 40, },
+      { 'filename',                       path = 1,                                shorting_target = 40, },
       { git_blame.get_current_blame_text, cond = git_blame.is_blame_text_available }
     }
   }
@@ -316,12 +329,13 @@ vim.keymap.set('n', '<leader>sg', require('telescope.builtin').live_grep, { desc
 vim.keymap.set('n', '<leader>sd', require('telescope.builtin').diagnostics, { desc = '[S]earch [D]iagnostics' })
 vim.keymap.set('n', '<leader>sf', require('telescope').extensions.flutter.commands, { desc = '[S]earch [F]lutter' })
 vim.keymap.set('n', '<leader>sp', require('telescope').extensions.dap.commands, { desc = '[S]earch DA[P] (Debugger)' })
+vim.keymap.set('n', '<leader>sr', require('telescope.builtin').resume, { desc = '[S]earch [R]esume' })
 
 -- [[ Configure Treesitter ]]
 -- See `:help nvim-treesitter`
 require('nvim-treesitter.configs').setup {
   -- Add languages to be installed here that you want installed for treesitter
-  ensure_installed = { 'c', 'cpp', 'go', 'lua', 'python', 'rust', 'typescript', 'help', 'vim', 'dart' },
+  ensure_installed = { 'c', 'cpp', 'go', 'java', 'lua', 'python', 'rust', 'typescript', 'help', 'vim', 'dart' },
 
   highlight = { enable = true },
   indent = { enable = true, disable = { 'python' } },
@@ -386,65 +400,7 @@ vim.keymap.set('n', ']d', vim.diagnostic.goto_next)
 vim.keymap.set('n', '<leader>e', vim.diagnostic.open_float)
 vim.keymap.set('n', '<leader>q', vim.diagnostic.setloclist)
 
--- LSP settings.
---  This function gets run when an LSP connects to a particular buffer.
-local on_attach = function(_, bufnr)
-  -- NOTE: Remember that lua is a real programming language, and as such it is possible
-  -- to define small helper and utility functions so you don't have to repeat yourself
-  -- many times.
-  --
-  -- In this case, we create a function that lets us more easily define mappings specific
-  -- for LSP related items. It sets the mode, buffer and description for us each time.
-  local nmap = function(keys, func, desc)
-    if desc then
-      desc = 'LSP: ' .. desc
-    end
-
-    vim.keymap.set('n', keys, func, { buffer = bufnr, desc = desc })
-  end
-
-  local xmap = function(keys, func, desc)
-    if desc then
-      desc = 'LSP: ' .. desc
-    end
-
-    vim.keymap.set('x', keys, func, { buffer = bufnr, desc = desc })
-  end
-
-  nmap('<leader>rn', vim.lsp.buf.rename, '[R]e[n]ame')
-  nmap('<leader>ca', vim.lsp.buf.code_action, '[C]ode [A]ction')
-  xmap('<leader>ca', vim.lsp.buf.code_action, '[C]ode [A]ction')
-
-  nmap('gd', vim.lsp.buf.definition, '[G]oto [D]efinition')
-  nmap('gr', require('telescope.builtin').lsp_references, '[G]oto [R]eferences')
-  nmap('gI', vim.lsp.buf.implementation, '[G]oto [I]mplementation')
-  nmap('<leader>D', vim.lsp.buf.type_definition, 'Type [D]efinition')
-  nmap('<leader>ds', require('telescope.builtin').lsp_document_symbols, '[D]ocument [S]ymbols')
-  nmap('<leader>ws', require('telescope.builtin').lsp_dynamic_workspace_symbols, '[W]orkspace [S]ymbols')
-
-  -- See `:help K` for why this keymap
-  nmap('K', vim.lsp.buf.hover, 'Hover Documentation')
-  nmap('<C-k>', vim.lsp.buf.signature_help, 'Signature Documentation')
-
-  -- Lesser used LSP functionality
-  nmap('gD', vim.lsp.buf.declaration, '[G]oto [D]eclaration')
-  nmap('<leader>wa', vim.lsp.buf.add_workspace_folder, '[W]orkspace [A]dd Folder')
-  nmap('<leader>wr', vim.lsp.buf.remove_workspace_folder, '[W]orkspace [R]emove Folder')
-  nmap('<leader>wl', function()
-    print(vim.inspect(vim.lsp.buf.list_workspace_folders()))
-  end, '[W]orkspace [L]ist Folders')
-
-  -- Create a command `:Format` local to the LSP buffer
-  vim.api.nvim_buf_create_user_command(bufnr, 'Format', function(_)
-    vim.lsp.buf.format()
-  end, { desc = 'Format current buffer with LSP' })
-
-  vim.api.nvim_create_autocmd('BufWritePre', {
-    command = 'lua vim.lsp.buf.format()',
-    buffer = bufnr,
-  })
-
-end
+local on_attach = require('./lsp').on_attach
 
 -- Enable the following language servers
 --  Feel free to add/remove any LSPs that you want here. They will automatically be installed.
@@ -456,9 +412,16 @@ local servers = {
   -- gopls = {},
   -- pyright = {},
   -- rust_analyzer = {},
+  yamlls = {
+    yaml = {
+      schemaStore = {
+        enable = true,
+        url = "https://www.schemastore.org/api/json/catalog.json"
+      }
+    }
+  },
   tsserver = {},
-
-  sumneko_lua = {
+  lua_ls = {
     Lua = {
       workspace = { checkThirdParty = false },
       telemetry = { enable = false },
@@ -501,7 +464,7 @@ local cmp = require 'cmp'
 local luasnip = require 'luasnip'
 local from_vscode = require 'luasnip.loaders.from_vscode'
 
-from_vscode.lazy_load() -- load plugins
+from_vscode.lazy_load()                        -- load plugins
 from_vscode.load({ paths = { "./snippets" } }) -- load locally
 
 -- activate optional frameworks
@@ -520,7 +483,7 @@ cmp.setup {
     ['<C-Space>'] = cmp.mapping.complete({}),
     ['<CR>'] = cmp.mapping.confirm {
       behavior = cmp.ConfirmBehavior.Replace,
-      select = true,
+      select = false,
     },
     ['<Tab>'] = cmp.mapping(function(fallback)
       if cmp.visible() then
@@ -544,6 +507,7 @@ cmp.setup {
   sources = {
     { name = 'nvim_lsp' },
     { name = 'luasnip' },
+    { name = 'buffer' },
   },
 }
 
@@ -660,32 +624,10 @@ npairs.add_rule(
 
 require('telescope').load_extension('dap')
 
-local dap, dapui = require("dap"), require("dapui")
+local dapui = require("dapui")
 dapui.setup {}
-vim.keymap.set('n', '<leader>dp', '<cmd>lua require("dapui").toggle()<CR>')
-
-local api = vim.api
-local keymap_restore = {}
-dap.listeners.after['event_initialized']['me'] = function()
-  for _, buf in pairs(api.nvim_list_bufs()) do
-    local keymaps = api.nvim_buf_get_keymap(buf, 'n')
-    for _, keymap in pairs(keymaps) do
-      if keymap.lhs == "K" then
-        table.insert(keymap_restore, keymap)
-        api.nvim_buf_del_keymap(buf, 'n', 'K')
-      end
-    end
-  end
-  api.nvim_set_keymap(
-    'n', 'K', '<Cmd>lua require("dap.ui.widgets").hover()<CR>', { silent = true })
-end
-
-dap.listeners.after['event_terminated']['me'] = function()
-  for _, keymap in pairs(keymap_restore) do
-    vim.keymap.set('n', 'K', vim.lsp.buf.hover, { buffer = keymap.buffer, desc = '[LSP] Hover Documentation' })
-  end
-  keymap_restore = {}
-end
+vim.keymap.set('n', '<leader>dp', '<cmd>lua require("dapui").toggle()<CR>', { silent = true })
+vim.keymap.set('n', '<leader>i', '<Cmd>lua require("dap.ui.widgets").hover()<CR>', { silent = true })
 
 -- In visual mode, shift-J / shift-k moves and indents the selection
 vim.keymap.set("v", "J", ":m '>+1<CR>gv=gv")

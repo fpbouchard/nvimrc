@@ -4,7 +4,7 @@
 		"prefix": "notifierProvider",
 		"description": "Create a NotifierProvider",
 		"body": [
-			"final $1Provider = NotifierProvider<$2, $3>($2.new);",
+			"final $1Provider = NotifierProvider<$2, $3>($2.new);"
 		]
 	},
 	"Riverpod: Notifier Provider with Family": {
@@ -12,7 +12,7 @@
 		"prefix": "notifierProviderFamily",
 		"description": "Create a NotifierProvider with Family Modifier",
 		"body": [
-			"final $1Provider = NotifierProviderFamily<$2, $3, $4>($2.new);",
+			"final $1Provider = NotifierProviderFamily<$2, $3, $4>($2.new);"
 		]
-	},
+	}
 }
