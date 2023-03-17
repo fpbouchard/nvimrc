@@ -207,6 +207,7 @@ require("neodev").setup()
 
 -- Official language servers, not installed via null-ls
 local mason_servers = {
+	prismals = {},
 	tsserver = {},
 	lua_ls = {
 		Lua = {
@@ -308,7 +309,22 @@ require("mason-null-ls").setup_handlers({
 -- See `:help nvim-treesitter`
 require("nvim-treesitter.configs").setup({
 	-- Add languages to be installed here that you want installed for treesitter
-	ensure_installed = { "c", "cpp", "go", "java", "lua", "python", "rust", "typescript", "help", "vim", "dart" },
+	-- https://github.com/nvim-treesitter/nvim-treesitter#supported-languages
+	ensure_installed = {
+		"c",
+		"cpp",
+		"dart",
+		"go",
+		"help",
+		"java",
+		"lua",
+		"prisma",
+		"python",
+		"rust",
+		"typescript",
+		"vim",
+	},
+	auto_install = true,
 	highlight = { enable = true },
 	indent = { enable = true, disable = { "python" } },
 	incremental_selection = {
