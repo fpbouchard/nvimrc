@@ -222,20 +222,26 @@ local null_ls_sources = {
 	null_ls.builtins.formatting.stylua,
 	null_ls.builtins.diagnostics.eslint_d.with({
 		condition = function(utils)
-			utils.has_file({ ".eslintrc.json" })
+			return utils.has_file({ ".eslintrc.json" })
 		end,
 	}),
 	null_ls.builtins.formatting.eslint_d.with({
 		condition = function(utils)
-			utils.has_file({ ".eslintrc.json" })
+			return utils.has_file({ ".eslintrc.json" })
 		end,
 	}),
 	null_ls.builtins.formatting.prettierd.with({
 		condition = function(utils)
-			utils.has_file({ ".prettierrc.js" })
+			return utils.has_file({ ".prettierrc.js" })
 		end,
 	}),
 	null_ls.builtins.diagnostics.actionlint,
+	null_ls.builtins.diagnostics.checkstyle.with({
+		condition = function(utils)
+			return utils.root_has_file({ "config/checkstyle/checkstyle.xml" })
+		end,
+		extra_args = { "-c", "config/checkstyle/checkstyle.xml" },
+	}),
 }
 
 -- nvim-cmp supports additional completion capabilities, so broadcast that to servers
