@@ -42,7 +42,7 @@ require("lazy").setup({
 
 			-- Useful status updates for LSP
 			-- NOTE: `opts = {}` is the same as calling `require('fidget').setup({})`
-			{ "j-hui/fidget.nvim", opts = {} },
+			{ "j-hui/fidget.nvim", opts = {}, tag = "legacy" },
 
 			-- Additional lua configuration, makes nvim stuff amazing
 			"folke/neodev.nvim",
@@ -54,7 +54,7 @@ require("lazy").setup({
 		event = { "BufReadPre", "BufNewFile" },
 		dependencies = {
 			"williamboman/mason.nvim",
-			"jose-elias-alvarez/null-ls.nvim",
+			"nvimtools/none-ls.nvim",
 		},
 	},
 
@@ -77,6 +77,10 @@ require("lazy").setup({
 					theme = "auto",
 				},
 				sections = {
+					lualine_b = {
+						"diff",
+						"diagnostics",
+					},
 					lualine_c = {
 						{
 							"filename",
@@ -85,6 +89,10 @@ require("lazy").setup({
 						},
 						{ git_blame.get_current_blame_text, cond = git_blame.is_blame_text_available },
 					},
+					lualine_x = {
+						"filetype",
+					},
+					lualine_y = {},
 				},
 			})
 		end,
@@ -93,11 +101,17 @@ require("lazy").setup({
 	{
 		-- Add indentation guides even on blank lines
 		"lukas-reineke/indent-blankline.nvim",
-		-- Enable `lukas-reineke/indent-blankline.nvim`
-		-- See `:help indent_blankline.txt`
+		main = "ibl",
 		opts = {
-			char = "┊",
-			show_trailing_blankline_indent = false,
+			indent = {
+				char = "┊",
+			},
+			scope = {
+				char = "┃",
+				show_start = false,
+				show_end = false,
+			},
+			exclude = { filetypes = { "dashboard" } },
 		},
 	},
 
@@ -107,9 +121,9 @@ require("lazy").setup({
 	{
 		-- Highlight, edit, and navigate code
 		"nvim-treesitter/nvim-treesitter",
+		-- commit = "33eb472", -- until https://github.com/nvim-treesitter/nvim-treesitter/issues/4945 is fixed
 		dependencies = {
 			"nvim-treesitter/nvim-treesitter-textobjects",
-			"nvim-treesitter/playground",
 		},
 		config = function()
 			pcall(require("nvim-treesitter.install").update({ with_sync = true }))
@@ -152,15 +166,18 @@ vim.o.completeopt = "menuone,noselect"
 vim.o.clipboard = "unnamed,unnamedplus" -- connect to system clipboard
 vim.o.colorcolumn = "120"
 vim.o.cursorline = true
-vim.o.foldexpr = "nvim_treesitter#foldexpr()"
+-- vim.o.foldexpr = "nvim_treesitter#foldexpr()"
 vim.o.foldlevel = 99 -- do not fold by default
 vim.o.foldmethod = "expr"
+-- vim.o.nofoldenable = true
 vim.o.guicursor =
 	"n-v-c:block,i-ci-ve:ver25,r-cr:hor20,o:hor50,a:blinkwait700-blinkoff400-blinkon250-Cursor/lCursor,sm:block-blinkwait175-blinkoff150-blinkon175"
 vim.o.list = true
 vim.o.listchars = "tab:>-,trail:·,extends:>,precedes:<,nbsp:+"
 vim.o.scrolloff = 3
 vim.o.swapfile = false
+vim.o.splitbelow = true
+vim.o.splitright = true
 vim.o.timeoutlen = 500
 vim.o.title = true
 vim.o.undolevels = 5000
@@ -215,34 +232,56 @@ local mason_servers = {
 			telemetry = { enable = false },
 		},
 	},
+	rust_analyzer = {
+		analyzer = {
+			check = {
+				command = "clippy",
+			},
+		},
+		cargo = {
+			buildScripts = {
+				enable = true,
+			},
+		},
+		procMacro = {
+			enable = true,
+		},
+	},
+	yamlls = {
+		yaml = {
+			keyOrdering = false,
+			format = {
+				singleQuote = true,
+			},
+		},
+	},
+	gopls = {},
+	arduino_language_server = {},
 }
 
 -- Utility null-ls servers (prettier, eslint, etc)
 local null_ls = require("null-ls")
 local null_ls_sources = {
 	null_ls.builtins.formatting.stylua,
-	null_ls.builtins.diagnostics.eslint_d.with({
-		condition = function(utils)
-			return utils.has_file({ ".eslintrc.json" })
-		end,
-	}),
-	null_ls.builtins.formatting.eslint_d.with({
-		condition = function(utils)
-			return utils.has_file({ ".eslintrc.json" })
-		end,
-	}),
-	null_ls.builtins.formatting.prettierd.with({
-		condition = function(utils)
-			return utils.has_file({ ".prettierrc.js" })
-		end,
-	}),
+
+	null_ls.builtins.diagnostics.eslint_d,
+	null_ls.builtins.formatting.eslint_d,
+	null_ls.builtins.code_actions.eslint_d,
+
+	null_ls.builtins.formatting.prettierd,
+
 	null_ls.builtins.diagnostics.actionlint,
-	null_ls.builtins.diagnostics.checkstyle.with({
-		condition = function(utils)
-			return utils.root_has_file({ "config/checkstyle/checkstyle.xml" })
-		end,
-		extra_args = { "-c", "config/checkstyle/checkstyle.xml" },
-	}),
+
+	null_ls.builtins.diagnostics.shellcheck,
+	null_ls.builtins.code_actions.shellcheck,
+
+	null_ls.builtins.diagnostics.terraform_validate,
+	null_ls.builtins.formatting.terraform_fmt,
+
+	null_ls.builtins.diagnostics.golangci_lint,
+	null_ls.builtins.formatting.goimports_reviser,
+
+	null_ls.builtins.formatting.google_java_format,
 }
 
 -- nvim-cmp supports additional completion capabilities, so broadcast that to servers
@@ -270,39 +309,32 @@ mason_lspconfig.setup_handlers({
 	end,
 })
 
+local fqbn = "arduino:avr:uno"
+local lspconfig = require("lspconfig")
+lspconfig.arduino_language_server.setup({
+	cmd = {
+		"arduino-language-server",
+		"-cli-config",
+		"/Users/fp/Library/Arduino15/arduino-cli.yaml",
+		"-fqbn",
+		fqbn,
+	},
+
+	on_attach = on_attach,
+	capabilities = capabilities,
+})
+
 null_ls.setup({
 	sources = null_ls_sources,
+	-- temp_dir = vim.fn.stdpath("cache") .. "/null-ls",
 	on_attach = on_attach,
 })
 
 -- Setup mason-null-ls
 require("mason-null-ls").setup({
-	ensure_installed = nil,
+	ensure_installed = {},
 	automatic_installation = true,
 	automatic_setup = false,
-})
-
-require("mason-null-ls").setup_handlers({
-	function(source, types)
-		-- Log source and all its types and builtins
-		-- vim.tbl_map(function(type)
-		-- 	vim.pretty_print({
-		-- 		handler = "mason-null-ls",
-		-- 		source = source,
-		-- 		type = type,
-		-- 		builtin = null_ls.builtins[type][source],
-		-- 	})
-		-- end, types)
-
-		-- or, log a simple line with the type
-		-- vim.pretty_print({
-		-- 	handler = "mason-null-ls",
-		-- 	source = source,
-		-- 	types = types,
-		-- })
-
-		require("mason-null-ls.automatic_setup")(source, types)
-	end,
 })
 
 -- [[ Configure Treesitter ]]
@@ -311,9 +343,7 @@ require("nvim-treesitter.configs").setup({
 	-- Add languages to be installed here that you want installed for treesitter
 	-- https://github.com/nvim-treesitter/nvim-treesitter#supported-languages
 	ensure_installed = {
-		"c",
-		"cpp",
-		"dart",
+		-- "dart",
 		"go",
 		"help",
 		"java",
@@ -325,6 +355,7 @@ require("nvim-treesitter.configs").setup({
 		"vim",
 	},
 	auto_install = true,
+	ignore_install = { "dart" }, -- until this is fixed https://github.com/nvim-treesitter/nvim-treesitter/issues/4945
 	highlight = { enable = true },
 	indent = { enable = true, disable = { "python" } },
 	incremental_selection = {

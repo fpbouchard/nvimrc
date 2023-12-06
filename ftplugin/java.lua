@@ -1,9 +1,7 @@
 local HOME = os.getenv("HOME")
-local JABBA_HOME = os.getenv("JABBA_HOME")
+-- local JAVA_HOME = os.getenv("JAVA_HOME")
 local root_markers = { "gradlew", "mvnw", ".git", "pom.xml", "build.gradle" }
 local root_dir = require("jdtls.setup").find_root(root_markers)
-
-vim.pretty_print("ROOT DIR: " .. root_dir)
 
 -- eclipse.jdt.ls stores project specific data within a folder. If you are working
 -- with multiple different projects, each project must use a dedicated data directory.
@@ -18,7 +16,7 @@ local on_attach = require("../lsp_config").on_attach
 local config = {
 	on_attach = on_attach,
 	cmd = {
-		JABBA_HOME .. "/jdk/default/Contents/Home/bin/java", -- or '/path/to/java17_or_newer/bin/java'
+		"/Users/fp/.asdf/installs/java/zulu-17.42.19/bin/java", -- or '/path/to/java17_or_newer/bin/java'
 		"-Declipse.application=org.eclipse.jdt.ls.core.id1",
 		"-Dosgi.bundles.defaultStartLevel=4",
 		"-Declipse.product=org.eclipse.jdt.ls.core.product",
@@ -41,11 +39,18 @@ local config = {
 	root_dir = root_dir,
 	settings = {
 		java = {
+			format = {
+				enabled = false,
+			},
 			configuration = {
 				runtimes = {
 					{
 						name = "JavaSE-1.8",
-						path = JABBA_HOME .. "/jdk/zulu@1.8/Contents/Home",
+						path = "/Users/fp/.asdf/installs/java/zulu-8.70.0.23",
+					},
+					{
+						name = "JavaSE-17",
+						path = "/Users/fp/.asdf/installs/java/zulu-17.42.19",
 					},
 				},
 			},
