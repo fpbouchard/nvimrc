@@ -25,6 +25,10 @@ return {
 							["<C-t>"] = false,
 						},
 					},
+					layout_strategy = "flex",
+					layout_config = {
+						horizontal = { width = 0.95, preview_width = 0.4 },
+					},
 					scroll_strategy = "limit",
 					path_display = { "smart" },
 					dynamic_preview_title = true,
