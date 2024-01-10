@@ -5,8 +5,10 @@ return {
   dependencies = {
     "nvim-treesitter/nvim-treesitter-textobjects",
   },
-  config = function()
+  build = function()
     pcall(require("nvim-treesitter.install").update({ with_sync = true }))
+  end,
+  config = function()
     -- See `:help nvim-treesitter`
     require("nvim-treesitter.configs").setup({
       -- Add languages to be installed here that you want installed for treesitter
@@ -23,7 +25,6 @@ return {
         "typescript",
         "vim",
       },
-      sync_install = true,
       auto_install = true,
       ignore_install = { "dart" }, -- until this is fixed https://github.com/nvim-treesitter/nvim-treesitter/issues/4945
       highlight = { enable = true },
