@@ -14,65 +14,46 @@ return {
     ]]
     logo = string.rep("\n", 8) .. logo .. "\n\n"
     local opts = {
-      theme = "doom",
+      theme = "hyper",
       config = {
         header = vim.split(logo, "\n"),
-        center = {
+        shortcut = {
           {
             action = "Telescope find_files",
-            desc = " Find file",
-            icon = " ",
+            desc = " Find file",
             key = "f",
-          },
-          {
-            action = "ene | startinsert",
-            desc = " New file",
-            icon = " ",
-            key = "n",
+            group = "DiagnosticInfo",
           },
           {
             action = "Telescope oldfiles",
-            desc = " Recent files",
-            icon = " ",
+            desc = " Recent files",
             key = "r",
-          },
-          {
-            action = "Telescope live_grep",
-            desc = " Find text",
-            icon = " ",
-            key = "g",
+            group = "Conditional",
           },
           {
             action = "Lazy",
-            desc = " Lazy",
-            icon = "󰒲 ",
+            desc = "󰒲 Lazy",
             key = "l",
+            group = "DiagnosticOk",
           },
           {
             action = "Mason",
-            desc = " Mason",
-            icon = "󰣪 ",
+            desc = "󰣪 Mason",
             key = "m",
+            group = "DiagnosticError",
           },
           {
             action = "qa",
-            desc = " Quit",
-            icon = " ",
+            desc = " Quit",
             key = "q",
+            group = "Comment",
           },
         },
-        footer = function()
-          local stats = require("lazy").stats()
-          local ms = (math.floor(stats.startuptime * 100 + 0.5) / 100)
-          return { "⚡ Neovim loaded " .. stats.loaded .. "/" .. stats.count .. " plugins in " .. ms .. "ms" }
-        end,
+        project = { enable = false },
+        mru = { limit = 20 },
+        footer = {},
       },
     }
-
-    for _, button in ipairs(opts.config.center) do
-      button.desc = button.desc .. string.rep(" ", 43 - #button.desc)
-      button.key_format = "  %s"
-    end
 
     -- close Lazy and re-open when the dashboard is ready
     if vim.o.filetype == "lazy" then

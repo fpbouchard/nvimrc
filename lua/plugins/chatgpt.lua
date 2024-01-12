@@ -1,16 +1,7 @@
 return {
   "jackMort/ChatGPT.nvim",
   config = function()
-    require("chatgpt").setup({
-      openai_params = {
-        model = "gpt-4-1106-preview",
-        max_tokens = 127000,
-      },
-      openai_edit_params = {
-        model = "gpt-4-1106-preview",
-        max_tokens = 127000,
-      },
-    })
+    require("chatgpt").setup({})
 
     local wk = require("which-key")
 
