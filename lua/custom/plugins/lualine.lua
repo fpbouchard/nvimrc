@@ -1,33 +1,48 @@
 return {
-	"nvim-lualine/lualine.nvim",
-	dependencies = { "nvim-tree/nvim-web-devicons", "f-person/git-blame.nvim" },
-	config = function()
-		-- Set lualine as statusline
-		-- See `:help lualine.txt`
-		vim.g.gitblame_display_virtual_text = 0 -- Disable virtual text
-		local git_blame = require("gitblame")
-		require("lualine").setup({
-			options = {
-				theme = "auto",
-			},
-			sections = {
-				lualine_b = {
-					"diff",
-					"diagnostics",
-				},
-				lualine_c = {
-					{
-						"filename",
-						path = 1,
-						shorting_target = 40,
-					},
-					{ git_blame.get_current_blame_text, cond = git_blame.is_blame_text_available },
-				},
-				lualine_x = {
-					"filetype",
-				},
-				lualine_y = {},
-			},
-		})
-	end,
+  "nvim-lualine/lualine.nvim",
+  dependencies = { "nvim-tree/nvim-web-devicons", "mfussenegger/nvim-dap" },
+  opts = {
+    sections = {
+      lualine_b = {
+        {
+          "diff",
+          source = function()
+            -- since gitsigns already does this, we can just use its cached values
+            local gitsigns = vim.b.gitsigns_status_dict
+            if gitsigns then
+              return {
+                added = gitsigns.added,
+                modified = gitsigns.changed,
+                removed = gitsigns.removed,
+              }
+            end
+          end,
+        },
+        "diagnostics",
+      },
+      lualine_c = {
+        {
+          "filename",
+          path = 1,
+        },
+      },
+      lualine_x = {
+        {
+          function()
+            return "  " .. require("dap").status()
+          end,
+          cond = function()
+            return package.loaded["dap"] and require("dap").status() ~= ""
+          end,
+        },
+        {
+          require("lazy.status").updates,
+          cond = require("lazy.status").has_updates,
+          color = { fg = "#ff9e64" },
+        },
+        { "filetype" },
+      },
+      lualine_y = {},
+    },
+  },
 }

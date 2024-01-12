@@ -12,7 +12,17 @@ if not vim.loop.fs_stat(lazypath) then
 end
 vim.opt.rtp:prepend(lazypath)
 
-require("lazy").setup({ { import = "custom.plugins" } }, { change_detection = { notify = false } })
+require("lazy").setup({
+  import = "custom.plugins",
+}, {
+  checker = {
+    enabled = true,
+    notify = false,
+  },
+  change_detection = {
+    notify = false,
+  },
+})
 
 -- [[ Setting options ]]
 -- See `:help vim.o`
@@ -21,7 +31,7 @@ require("lazy").setup({ { import = "custom.plugins" } }, { change_detection = { 
 vim.o.hlsearch = false
 
 -- Make line numbers default
-vim.wo.number = true
+vim.o.number = true
 
 -- Enable mouse mode
 vim.o.mouse = "a"
@@ -38,21 +48,20 @@ vim.o.smartcase = true
 
 -- Decrease update time
 vim.o.updatetime = 250
-vim.wo.signcolumn = "yes"
+vim.o.signcolumn = "yes:2"
 
 -- Set completeopt to have a better completion experience
-vim.o.completeopt = "menuone,noselect"
+vim.o.completeopt = "menu,menuone,noselect"
 
--- FP: General settings
 vim.o.clipboard = "unnamed,unnamedplus" -- connect to system clipboard
 vim.o.colorcolumn = "120"
 vim.o.cursorline = true
--- vim.o.foldexpr = "nvim_treesitter#foldexpr()"
-vim.o.foldlevel = 99 -- do not fold by default
+vim.o.foldexpr = "nvim_treesitter#foldexpr()"
 vim.o.foldmethod = "expr"
--- vim.o.nofoldenable = true
-vim.o.guicursor =
-  "n-v-c:block,i-ci-ve:ver25,r-cr:hor20,o:hor50,a:blinkwait700-blinkoff400-blinkon250-Cursor/lCursor,sm:block-blinkwait175-blinkoff150-blinkon175"
+vim.o.foldlevel = 99
+vim.o.foldenable = false
+-- vim.o.guicursor =
+--   "n-v-c:block,i-ci-ve:ver25,r-cr:hor20,o:hor50,a:blinkwait700-blinkoff400-blinkon250-Cursor/lCursor,sm:block-blinkwait175-blinkoff150-blinkon175"
 vim.o.list = true
 vim.o.listchars = "tab:>-,trail:·,extends:>,precedes:<,nbsp:+"
 vim.o.scrolloff = 3
@@ -76,6 +85,8 @@ vim.o.tabstop = 2
 vim.o.softtabstop = 2
 vim.o.shiftwidth = 2
 vim.o.shiftround = true
+
+vim.o.smoothscroll = true
 
 -- [[ Basic Keymaps ]]
 

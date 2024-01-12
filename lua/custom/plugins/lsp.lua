@@ -5,7 +5,6 @@ return {
     -- Automatically install LSPs to stdpath for neovim
     "williamboman/mason.nvim",
     "williamboman/mason-lspconfig.nvim",
-    "jay-babu/mason-null-ls.nvim",
     "hrsh7th/cmp-nvim-lsp", -- LSP source for nvim-cmp
 
     -- Useful status updates for LSP
@@ -18,6 +17,7 @@ return {
   config = function()
     -- Official language servers, not installed via null-ls
     local mason_servers = {
+      eslint = {},
       prismals = {},
       tsserver = {},
       lua_ls = {

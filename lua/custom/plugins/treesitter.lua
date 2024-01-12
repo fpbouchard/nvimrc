@@ -5,9 +5,10 @@ return {
   dependencies = {
     "nvim-treesitter/nvim-treesitter-textobjects",
   },
-  build = function()
-    pcall(require("nvim-treesitter.install").update({ with_sync = true }))
-  end,
+  build = ":TSUpdate",
+  -- build = function()
+  --   pcall(require("nvim-treesitter.install").update({ with_sync = true }))
+  -- end,
   config = function()
     -- See `:help nvim-treesitter`
     require("nvim-treesitter.configs").setup({
@@ -16,7 +17,7 @@ return {
       ensure_installed = {
         -- "dart",
         "go",
-        "help",
+        "vimdoc",
         "java",
         "lua",
         "prisma",

@@ -1,12 +1,11 @@
 return {
   "jay-babu/mason-null-ls.nvim",
-  event = { "BufReadPre", "BufNewFile" },
   dependencies = {
+    "neovim/nvim-lspconfig",
     "williamboman/mason.nvim",
     "nvimtools/none-ls.nvim",
   },
   config = function()
-    -- Utility null-ls servers (prettier, eslint, etc)
     local null_ls = require("null-ls")
     local on_attach = require("./lsp_on_attach").on_attach
 
@@ -14,16 +13,13 @@ return {
       sources = {
         null_ls.builtins.formatting.stylua,
 
-        null_ls.builtins.diagnostics.eslint_d,
-        null_ls.builtins.formatting.eslint_d,
-        null_ls.builtins.code_actions.eslint_d,
-
         null_ls.builtins.formatting.prettierd,
 
-        null_ls.builtins.diagnostics.actionlint,
-
+        null_ls.builtins.formatting.shfmt,
         null_ls.builtins.diagnostics.shellcheck,
         null_ls.builtins.code_actions.shellcheck,
+        null_ls.builtins.formatting.beautysh,
+        null_ls.builtins.hover.printenv,
 
         null_ls.builtins.diagnostics.terraform_validate,
         null_ls.builtins.formatting.terraform_fmt,
@@ -32,6 +28,18 @@ return {
         null_ls.builtins.formatting.goimports_reviser,
 
         null_ls.builtins.formatting.google_java_format,
+
+        null_ls.builtins.diagnostics.commitlint,
+
+        null_ls.builtins.diagnostics.hadolint, -- Dockerfile
+
+        null_ls.builtins.diagnostics.jsonlint,
+
+        null_ls.builtins.diagnostics.markdownlint,
+
+        null_ls.builtins.diagnostics.stylelint, -- CSS
+
+        null_ls.builtins.diagnostics.yamllint,
       },
       -- temp_dir = vim.fn.stdpath("cache") .. "/null-ls",
       on_attach = on_attach,
