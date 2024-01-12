@@ -20,6 +20,7 @@ return {
         null_ls.builtins.code_actions.shellcheck,
         null_ls.builtins.formatting.beautysh,
         null_ls.builtins.hover.printenv,
+        null_ls.builtins.diagnostics.zsh,
 
         null_ls.builtins.diagnostics.terraform_validate,
         null_ls.builtins.formatting.terraform_fmt,
