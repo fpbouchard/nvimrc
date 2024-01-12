@@ -2,10 +2,21 @@ return {
   "tpope/vim-fugitive",
   {
     "FabijanZulj/blame.nvim",
-    opts = {},
-    keys = {
-      { "<leader>tb", "<cmd>ToggleBlame virtual<CR>", desc = "[T]oggle [B]lame" },
+    dependencies = {
+      "folke/which-key.nvim",
     },
+    config = function()
+      local wk = require("which-key")
+      wk.register({
+        t = {
+          name = "Toggle",
+          b = { "<cmd>ToggleBlame virtual<CR>", "[T]oggle [B]lame", mode = { "n" } },
+        },
+      }, {
+        prefix = "<leader>",
+        mode = "n",
+      })
+    end,
   },
   {
     "lewis6991/gitsigns.nvim",
