@@ -21,39 +21,54 @@ return {
       prismals = {},
       tsserver = {},
       lua_ls = {
-        Lua = {
-          workspace = { checkThirdParty = false },
-          telemetry = { enable = false },
-          format = { enable = false },
-          -- NOTE: toggle below to ignore Lua_LS's noisy `missing-fields` warnings
-          diagnostics = { disable = { "missing-fields" } },
+        settings = {
+          Lua = {
+            workspace = { checkThirdParty = false },
+            telemetry = { enable = false },
+            -- NOTE: toggle below to use Lua_LS's built-in formatter, or use null-ls
+            format = { enable = false },
+            -- NOTE: toggle below to ignore Lua_LS's noisy `missing-fields` warnings
+            diagnostics = { disable = { "missing-fields" } },
+          },
         },
       },
       rust_analyzer = {
-        analyzer = {
-          check = {
-            command = "clippy",
+        settings = {
+          analyzer = {
+            check = {
+              command = "clippy",
+            },
           },
-        },
-        cargo = {
-          buildScripts = {
+          cargo = {
+            buildScripts = {
+              enable = true,
+            },
+          },
+          procMacro = {
             enable = true,
           },
         },
-        procMacro = {
-          enable = true,
-        },
       },
       yamlls = {
-        yaml = {
-          keyOrdering = false,
-          format = {
-            singleQuote = true,
+        settings = {
+          yaml = {
+            keyOrdering = false,
+            format = {
+              singleQuote = true,
+            },
           },
         },
       },
       gopls = {},
-      arduino_language_server = {},
+      arduino_language_server = {
+        cmd = {
+          "arduino-language-server",
+          "-cli-config",
+          "/Users/fp/Library/Arduino15/arduino-cli.yaml",
+          "-fqbn",
+          "arduino:avr:uno",
+        },
+      },
     }
 
     -- nvim-cmp supports additional completion capabilities, so broadcast that to servers
@@ -72,29 +87,10 @@ return {
 
     mason_lspconfig.setup_handlers({
       function(server_name)
-        -- vim.pretty_print({ handler = "mason_lspconfig", server_name = server_name })
-        require("lspconfig")[server_name].setup({
-          capabilities = capabilities,
-          on_attach = on_attach,
-          settings = mason_servers[server_name],
-        })
+        mason_servers[server_name].on_attach = on_attach
+        mason_servers[server_name].capabilities = capabilities
+        require("lspconfig")[server_name].setup(mason_servers[server_name])
       end,
-    })
-
-    -- Arduino Language Server
-    local fqbn = "arduino:avr:uno"
-    local lspconfig = require("lspconfig")
-    lspconfig.arduino_language_server.setup({
-      cmd = {
-        "arduino-language-server",
-        "-cli-config",
-        "/Users/fp/Library/Arduino15/arduino-cli.yaml",
-        "-fqbn",
-        fqbn,
-      },
-
-      on_attach = on_attach,
-      capabilities = capabilities,
     })
   end,
 }
