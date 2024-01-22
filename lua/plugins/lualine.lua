@@ -2,6 +2,9 @@ return {
   "nvim-lualine/lualine.nvim",
   dependencies = { "nvim-tree/nvim-web-devicons", "mfussenegger/nvim-dap" },
   opts = {
+    options = {
+      theme = "catppuccin",
+    },
     sections = {
       lualine_b = {
         {

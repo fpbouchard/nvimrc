@@ -18,7 +18,7 @@ return {
 
         local jdtls_root = vim.fn.glob(HOME .. "/.local/share/jdtls")
 
-        local on_attach = require("../lsp_on_attach").on_attach
+        local on_attach = require("lsp_on_attach").on_attach
 
         local config = {
           on_attach = on_attach,
@@ -47,7 +47,7 @@ return {
           settings = {
             java = {
               format = {
-                enabled = false,
+                enabled = false, -- using google-java-format through null-ls
               },
               configuration = {
                 runtimes = {

@@ -7,7 +7,7 @@ return {
   },
   config = function()
     local null_ls = require("null-ls")
-    local on_attach = require("./lsp_on_attach").on_attach
+    local on_attach = require("lsp_on_attach").on_attach
 
     null_ls.setup({
       sources = {

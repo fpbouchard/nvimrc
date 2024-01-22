@@ -79,7 +79,7 @@ return {
     require("mason").setup()
 
     local mason_lspconfig = require("mason-lspconfig")
-    local on_attach = require("./lsp_on_attach").on_attach
+    local on_attach = require("lsp_on_attach").on_attach
 
     mason_lspconfig.setup({
       ensure_installed = vim.tbl_keys(mason_servers),

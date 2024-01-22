@@ -92,8 +92,9 @@ return {
         require("telescope.builtin").oldfiles,
         { desc = "[?] Find recently opened files" }
       )
-      vim.keymap.set("n", "<leader>f", "<Cmd>Telescope frecency<CR>", { desc = "[f] Find by [F]recency" })
-      vim.keymap.set("n", "<leader>b", require("telescope.builtin").buffers, { desc = "[b] Find existing buffers" })
+      vim.keymap.set("n", "<leader>f", "<Cmd>Telescope frecency<CR>", { desc = "Find by [f]recency" })
+      vim.keymap.set("n", "<leader>b", require("telescope.builtin").buffers, { desc = "Find existing [b]uffers" })
+      vim.keymap.set("n", "<leader>m", require("telescope.builtin").marks, { desc = "Find [m]arks" })
       vim.keymap.set(
         "n",
         "<leader>sw",
