@@ -23,6 +23,7 @@ return {
         "prisma",
         "python",
         "rust",
+        "sql",
         "typescript",
         "vim",
       },

@@ -92,7 +92,6 @@ return {
         require("telescope.builtin").oldfiles,
         { desc = "[?] Find recently opened files" }
       )
-      vim.keymap.set("n", "<leader>f", "<Cmd>Telescope frecency<CR>", { desc = "Find by [f]recency" })
       vim.keymap.set("n", "<leader>b", require("telescope.builtin").buffers, { desc = "Find existing [b]uffers" })
       vim.keymap.set("n", "<leader>m", require("telescope.builtin").marks, { desc = "Find [m]arks" })
       vim.keymap.set(
@@ -149,12 +148,6 @@ return {
       vim.api.nvim_set_keymap("n", "-", ":Telescope file_browser path=%:p:h select_buffer=true<CR>", { noremap = true })
 
       require("telescope").load_extension("file_browser")
-    end,
-  },
-  {
-    "nvim-telescope/telescope-frecency.nvim",
-    config = function()
-      require("telescope").load_extension("frecency")
     end,
   },
 }

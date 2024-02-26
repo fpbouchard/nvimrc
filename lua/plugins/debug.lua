@@ -1,5 +1,4 @@
 return {
-
   {
     "mfussenegger/nvim-dap",
     dependencies = {
@@ -24,6 +23,30 @@ return {
         },
       })
 
+      -- Node debugging; make sure you use Mason to install the node-debug2 adapter
+      dap.adapters["node-debug2"] = {
+        type = "executable",
+        name = "node2",
+        command = "node",
+        args = {
+          vim.fn.stdpath("data") .. "/mason/packages/node-debug2-adapter/out/src/nodeDebug.js",
+          "${port}",
+        },
+      }
+      for _, language in ipairs({ "typescript", "javascript" }) do
+        dap.configurations[language] = {
+          {
+            type = "node-debug2",
+            request = "attach",
+            name = "Attach to debugger",
+            port = 9229,
+            sourceMaps = true,
+            protocol = "inspector",
+            console = "integratedTerminal",
+          },
+        }
+      end
+
       -- Basic debugging keymaps, feel free to change to your liking!
       vim.keymap.set("n", "<F5>", dap.continue)
       vim.keymap.set("n", "<F1>", dap.step_into)
@@ -38,6 +61,9 @@ return {
   },
   {
     "rcarriga/nvim-dap-ui",
+    dependencies = {
+      "mfussenegger/nvim-dap",
+    },
     config = function()
       require("dapui").setup()
 

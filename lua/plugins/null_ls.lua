@@ -16,9 +16,10 @@ return {
         null_ls.builtins.formatting.prettierd,
 
         null_ls.builtins.formatting.shfmt,
-        null_ls.builtins.diagnostics.shellcheck,
-        null_ls.builtins.code_actions.shellcheck,
-        null_ls.builtins.formatting.beautysh,
+        -- https://github.com/nvimtools/none-ls.nvim/issues/58
+        -- null_ls.builtins.diagnostics.shellcheck,
+        -- null_ls.builtins.code_actions.shellcheck,
+        -- null_ls.builtins.formatting.beautysh,
         null_ls.builtins.hover.printenv,
         null_ls.builtins.diagnostics.zsh,
 
@@ -34,13 +35,21 @@ return {
 
         null_ls.builtins.diagnostics.hadolint, -- Dockerfile
 
-        null_ls.builtins.diagnostics.jsonlint,
+        -- https://github.com/nvimtools/none-ls.nvim/issues/58
+        -- null_ls.builtins.diagnostics.jsonlint,
 
         null_ls.builtins.diagnostics.markdownlint,
 
         null_ls.builtins.diagnostics.stylelint, -- CSS
 
         null_ls.builtins.diagnostics.yamllint,
+
+        null_ls.builtins.diagnostics.sqlfluff.with({
+          extra_args = { "--dialect", "mysql" },
+        }),
+        null_ls.builtins.formatting.sqlfluff.with({
+          extra_args = { "--dialect", "mysql" },
+        }),
       },
       -- temp_dir = vim.fn.stdpath("cache") .. "/null-ls",
       on_attach = on_attach,

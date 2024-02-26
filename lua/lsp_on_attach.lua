@@ -1,15 +1,27 @@
 local M = {}
 
 local lsp_formatting = function(bufnr)
+  -- if the buffer has an eslint client, run eslint --fix
+  local util = require("lspconfig.util")
+  local eslint_lsp_client = util.get_active_client_by_name(bufnr, "eslint")
+  if eslint_lsp_client ~= nil then
+    vim.api.nvim_command("EslintFixAll")
+  end
+
+  -- If the buffer has null-ls sources, use them for formatting
+  local null_ls_sources = require("null-ls.sources")
+  local ft = vim.bo[bufnr].filetype
+  local has_null_ls = #null_ls_sources.get_available(ft, "NULL_LS_FORMATTING") > 0
+
   vim.lsp.buf.format({
-    filter = function(client)
-      -- Select which formatter should be chosen, depending on the language/plugins
-      -- By default, use null-ls (prettier, eslint, etc), unless the installed language lsp provides a
-      -- good formatter (ex.: dart)
-      -- In our case, we just want to avoid tsserver
-      return client.name ~= "tsserver"
-    end,
     bufnr = bufnr,
+    filter = function(client)
+      if has_null_ls then
+        return client.name == "null-ls"
+      else
+        return client.name ~= "tsserver"
+      end
+    end,
   })
 end
 
@@ -34,6 +46,14 @@ M.on_attach = function(client, bufnr)
     vim.keymap.set("x", keys, func, { buffer = bufnr, desc = desc })
   end
 
+  local imap = function(keys, func, desc)
+    if desc then
+      desc = "LSP: " .. desc
+    end
+
+    vim.keymap.set("i", keys, func, { buffer = bufnr, desc = desc })
+  end
+
   nmap("<leader>rn", vim.lsp.buf.rename, "[R]e[n]ame")
   nmap("<C-\\>", vim.lsp.buf.code_action, "[C]ode [A]ction")
   xmap("<C-\\>", vim.lsp.buf.code_action, "[C]ode [A]ction")
@@ -50,6 +70,7 @@ M.on_attach = function(client, bufnr)
   -- See `:help K` for why this keymap
   nmap("K", vim.lsp.buf.hover, "Hover Documentation")
   nmap("<C-k>", vim.lsp.buf.signature_help, "Signature Documentation")
+  imap("<C-k>", vim.lsp.buf.signature_help, "Signature Documentation")
   nmap("<C-e>", function()
     vim.diagnostic.open_float(nil, { focus = false })
   end, "Open Diagnostic Float")
