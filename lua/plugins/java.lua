@@ -18,10 +18,7 @@ return {
 
         local jdtls_root = vim.fn.glob(HOME .. "/.local/share/jdtls")
 
-        local on_attach = require("lsp_on_attach").on_attach
-
         local config = {
-          on_attach = on_attach,
           cmd = {
             "/Users/fp/.asdf/installs/java/zulu-17.42.19/bin/java", -- or '/path/to/java17_or_newer/bin/java'
             "-Declipse.application=org.eclipse.jdt.ls.core.id1",

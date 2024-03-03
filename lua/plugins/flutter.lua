@@ -18,7 +18,6 @@ return {
       -- nvim-cmp supports additional completion capabilities, so broadcast that to servers
       local capabilities = vim.lsp.protocol.make_client_capabilities()
       capabilities = require("cmp_nvim_lsp").default_capabilities(capabilities)
-      local on_attach = require("lsp_on_attach").on_attach
 
       require("flutter-tools").setup({
         flutter_lookup_cmd = "asdf where flutter",
@@ -26,7 +25,6 @@ return {
           color = {
             enabled = true,
           },
-          on_attach = on_attach,
           capabilities = capabilities,
           settings = {
             completeFunctionCalls = true,

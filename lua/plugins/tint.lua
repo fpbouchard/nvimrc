@@ -1,4 +1,4 @@
 return {
-  "sunjon/shade.nvim",
+  "levouh/tint.nvim",
   opts = {},
 }
