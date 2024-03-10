@@ -4,7 +4,6 @@ local function get_asdf_java_versions()
   handle:close()
   local versions = {}
   for line in result:gmatch("[^\r\n]+") do
-    -- Adjusted pattern to match both old and new versioning schemes
     local name, version = line:match("^(%w+)%-(%d+[%d%.]*)$")
     if name and version then
       local major_version = version:match("^(%d+)")
@@ -25,7 +24,7 @@ local function find_java_version(runtimes, version_name)
       return runtime
     end
   end
-  return nil -- Return nil if the version is not found
+  return nil
 end
 
 return {

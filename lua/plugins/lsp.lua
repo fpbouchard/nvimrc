@@ -246,9 +246,12 @@ return {
         end, { desc = "Format current buffer with LSP" })
 
         local client = vim.lsp.get_client_by_id(event.data.client_id)
+        if not client then
+          return
+        end
 
         -- Format on save
-        if client.supports_method("textDocument/formatting") then
+        if client.supports_method("textDocument/formatting", { bufnr = event.buf }) then
           vim.api.nvim_clear_autocmds({ group = augroup, buffer = event.buf })
           vim.api.nvim_create_autocmd("BufWritePre", {
             group = augroup,
@@ -260,7 +263,7 @@ return {
         end
 
         -- Enable Inlay Hints
-        if client.server_capabilities.inlayHintProvider then
+        if client.supports_method("textDocument/inlayHint") then
           vim.lsp.inlay_hint.enable(event.buf, true)
         end
       end,
