@@ -68,6 +68,7 @@ vim.o.scrolloff = 3
 vim.o.swapfile = false
 vim.o.splitbelow = true
 vim.o.splitright = true
+vim.o.termguicolors = true
 vim.o.timeoutlen = 500
 vim.o.title = true
 vim.o.undolevels = 5000

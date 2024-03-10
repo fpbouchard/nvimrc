@@ -1,9 +1,14 @@
 return {
-  "sainnhe/everforest",
+  "folke/tokyonight.nvim",
+  lazy = false,
+  priority = 1000,
   config = function()
-    vim.o.termguicolors = true
-    vim.g.everforest_background = "hard"
-    vim.g.everforest_better_performance = 1
-    vim.cmd.colorscheme("everforest")
+    require("tokyonight").setup({
+      dim_inactive = true,
+      on_highlights = function(hl, _)
+        hl.Comment = { fg = "#8194b3", style = "italic" }
+      end,
+    })
+    vim.cmd([[colorscheme tokyonight]])
   end,
 }

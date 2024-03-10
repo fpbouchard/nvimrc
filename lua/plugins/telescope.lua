@@ -2,7 +2,7 @@
 return {
   {
     "nvim-telescope/telescope.nvim",
-    branch = "0.1.x",
+    -- branch = "0.1.x", -- lock to 0.1.x if not using nvim nightly
     dependencies = {
       "nvim-lua/plenary.nvim",
       "mfussenegger/nvim-dap",
@@ -55,6 +55,9 @@ return {
                 ["<c-d>"] = actions.delete_buffer,
               },
             },
+          },
+          oldfiles = {
+            cwd_only = true,
           },
         },
         extensions = {

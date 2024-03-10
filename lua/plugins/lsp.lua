@@ -1,3 +1,5 @@
+local augroup = vim.api.nvim_create_augroup("LspFormatting", {})
+
 local lsp_formatting = function(bufnr)
   -- if the buffer has an eslint client, run eslint --fix
   local util = require("lspconfig.util")
@@ -45,7 +47,36 @@ return {
     local servers = {
       eslint = {},
       prismals = {},
-      tsserver = {},
+      tsserver = {
+        settings = {
+          typescript = {
+            inlayHints = {
+              -- You can set this to 'all' or 'literals' to enable more hints
+              includeInlayParameterNameHints = "literals", -- 'none' | 'literals' | 'all'
+              includeInlayParameterNameHintsWhenArgumentMatchesName = false,
+              includeInlayFunctionParameterTypeHints = false,
+              includeInlayVariableTypeHints = false,
+              includeInlayVariableTypeHintsWhenTypeMatchesName = false,
+              includeInlayPropertyDeclarationTypeHints = false,
+              includeInlayFunctionLikeReturnTypeHints = true,
+              includeInlayEnumMemberValueHints = true,
+            },
+          },
+          javascript = {
+            inlayHints = {
+              -- You can set this to 'all' or 'literals' to enable more hints
+              includeInlayParameterNameHints = "literals", -- 'none' | 'literals' | 'all'
+              includeInlayParameterNameHintsWhenArgumentMatchesName = false,
+              includeInlayVariableTypeHints = false,
+              includeInlayFunctionParameterTypeHints = false,
+              includeInlayVariableTypeHintsWhenTypeMatchesName = false,
+              includeInlayPropertyDeclarationTypeHints = false,
+              includeInlayFunctionLikeReturnTypeHints = true,
+              includeInlayEnumMemberValueHints = true,
+            },
+          },
+        },
+      },
       lua_ls = {
         settings = {
           Lua = {
@@ -55,6 +86,7 @@ return {
             format = { enable = false },
             -- NOTE: toggle below to ignore Lua_LS's noisy `missing-fields` warnings
             diagnostics = { disable = { "missing-fields" } },
+            hint = { enable = true },
           },
         },
       },
@@ -118,6 +150,7 @@ return {
       "google-java-format",
       "gopls",
       "hadolint",
+      "jdtls",
       "jsonlint",
       "markdownlint",
       "node-debug2-adapter",
@@ -133,6 +166,10 @@ return {
     require("mason-lspconfig").setup({
       handlers = {
         function(server_name)
+          -- jdtls is handled by the java.lua file
+          if server_name == "jdtls" then
+            return
+          end
           local server = servers[server_name] or {}
           -- This handles overriding only values explicitly passed
           -- by the server configuration above. Useful when disabling
@@ -208,10 +245,10 @@ return {
           lsp_formatting(event.buf)
         end, { desc = "Format current buffer with LSP" })
 
-        -- Format on save
         local client = vim.lsp.get_client_by_id(event.data.client_id)
+
+        -- Format on save
         if client.supports_method("textDocument/formatting") then
-          local augroup = vim.api.nvim_create_augroup("LspFormatting", {})
           vim.api.nvim_clear_autocmds({ group = augroup, buffer = event.buf })
           vim.api.nvim_create_autocmd("BufWritePre", {
             group = augroup,
@@ -220,6 +257,11 @@ return {
               lsp_formatting(event.buf)
             end,
           })
+        end
+
+        -- Enable Inlay Hints
+        if client.server_capabilities.inlayHintProvider then
+          vim.lsp.inlay_hint.enable(event.buf, true)
         end
       end,
     })
