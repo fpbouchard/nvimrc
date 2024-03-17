@@ -53,6 +53,9 @@ vim.o.signcolumn = "yes:2"
 -- Set completeopt to have a better completion experience
 vim.o.completeopt = "menu,menuone,noselect"
 
+-- Set session options as suggested by the persisted plugin
+vim.o.sessionoptions = "buffers,curdir,folds,tabpages,winpos,winsize"
+
 vim.o.clipboard = "unnamed,unnamedplus" -- connect to system clipboard
 vim.o.colorcolumn = "120"
 vim.o.cursorline = true

@@ -49,32 +49,32 @@ return {
       prismals = {},
       tsserver = {
         settings = {
-          typescript = {
-            inlayHints = {
-              -- You can set this to 'all' or 'literals' to enable more hints
-              includeInlayParameterNameHints = "literals", -- 'none' | 'literals' | 'all'
-              includeInlayParameterNameHintsWhenArgumentMatchesName = false,
-              includeInlayFunctionParameterTypeHints = false,
-              includeInlayVariableTypeHints = false,
-              includeInlayVariableTypeHintsWhenTypeMatchesName = false,
-              includeInlayPropertyDeclarationTypeHints = false,
-              includeInlayFunctionLikeReturnTypeHints = true,
-              includeInlayEnumMemberValueHints = true,
-            },
-          },
-          javascript = {
-            inlayHints = {
-              -- You can set this to 'all' or 'literals' to enable more hints
-              includeInlayParameterNameHints = "literals", -- 'none' | 'literals' | 'all'
-              includeInlayParameterNameHintsWhenArgumentMatchesName = false,
-              includeInlayVariableTypeHints = false,
-              includeInlayFunctionParameterTypeHints = false,
-              includeInlayVariableTypeHintsWhenTypeMatchesName = false,
-              includeInlayPropertyDeclarationTypeHints = false,
-              includeInlayFunctionLikeReturnTypeHints = true,
-              includeInlayEnumMemberValueHints = true,
-            },
-          },
+          -- typescript = {
+          --   inlayHints = {
+          --     -- You can set this to 'all' or 'literals' to enable more hints
+          --     includeInlayParameterNameHints = "none", -- 'none' | 'literals' | 'all'
+          --     includeInlayParameterNameHintsWhenArgumentMatchesName = false,
+          --     includeInlayFunctionParameterTypeHints = false,
+          --     includeInlayVariableTypeHints = false,
+          --     includeInlayVariableTypeHintsWhenTypeMatchesName = false,
+          --     includeInlayPropertyDeclarationTypeHints = false,
+          --     includeInlayFunctionLikeReturnTypeHints = true,
+          --     includeInlayEnumMemberValueHints = true,
+          --   },
+          -- },
+          -- javascript = {
+          --   inlayHints = {
+          --     -- You can set this to 'all' or 'literals' to enable more hints
+          --     includeInlayParameterNameHints = "none", -- 'none' | 'literals' | 'all'
+          --     includeInlayParameterNameHintsWhenArgumentMatchesName = false,
+          --     includeInlayVariableTypeHints = false,
+          --     includeInlayFunctionParameterTypeHints = false,
+          --     includeInlayVariableTypeHintsWhenTypeMatchesName = false,
+          --     includeInlayPropertyDeclarationTypeHints = false,
+          --     includeInlayFunctionLikeReturnTypeHints = true,
+          --     includeInlayEnumMemberValueHints = true,
+          --   },
+          -- },
         },
       },
       lua_ls = {
@@ -263,9 +263,9 @@ return {
         end
 
         -- Enable Inlay Hints
-        if client.supports_method("textDocument/inlayHint") then
-          vim.lsp.inlay_hint.enable(event.buf, true)
-        end
+        -- if client.supports_method("textDocument/inlayHint") then
+        --   vim.lsp.inlay_hint.enable(event.buf, true)
+        -- end
       end,
     })
   end,

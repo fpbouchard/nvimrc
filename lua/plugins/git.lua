@@ -10,7 +10,7 @@ return {
       wk.register({
         t = {
           name = "Toggle",
-          b = { "<cmd>ToggleBlame virtual<CR>", "[T]oggle [B]lame", mode = { "n" } },
+          b = { "<cmd>ToggleBlame<CR>", "[T]oggle [B]lame", mode = { "n" } },
         },
       }, {
         prefix = "<leader>",
